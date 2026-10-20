@@ -3,3 +3,68 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+
+/*
+ * Roam design tokens — single source of truth (see AGENTS.md "Design system").
+ * Derived from the design reference sheet. All sizes are px on purpose: rem is
+ * 14dp on native but 16px on web, so rem-based tokens would differ per platform.
+ */
+@theme {
+  /* Reset Tailwind defaults so only roam tokens exist (no stray bg-blue-500). */
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+
+  /* ---- Spacing: 4-point grid. p-1=4 · p-2=8 · p-4=16 · p-6=24 · p-8=32 · p-12=48 ---- */
+  --spacing: 4px;
+
+  /* ---- Colors (02. Color palette) ---- */
+  --color-primary: #ffc629; /* Primary Yellow: primary actions, active states */
+  --color-secondary: #c9b4ff; /* Lavender: secondary actions, highlights */
+  --color-foreground: #0b0b1a; /* Text Primary: headings, primary text */
+  --color-muted-foreground: #6b7280; /* Text Secondary: body, secondary text */
+  --color-surface: #ffffff; /* Surface White: cards, sheets, modals */
+  --color-background: #f4f5f7; /* Surface Gray: app background, input fields */
+  --color-border: #e5e7eb; /* Border Gray: dividers, borders */
+  --color-glass: rgb(
+    255 255 255 / 0.7
+  ); /* Glass Blur: tab bar, glass surfaces (alpha truncated in reference; 0.7 assumed) */
+
+  /* Soft tints + status colors — NOT in the palette spec; eyeballed from the
+     policy card, alerts and badges (14/15). Confirm with design. */
+  --color-primary-soft: #fff1c7;
+  --color-secondary-soft: #efe8ff;
+  --color-success: #2e9e5b;
+  --color-success-soft: #ddf3e4;
+  --color-danger: #e5383b;
+  --color-danger-soft: #fde1e6;
+  --color-info-soft: #dde9ff;
+
+  /* ---- Fonts (03. Typography) ----
+     One family per weight: static font files need the weight baked into the
+     family name, so use font-brand-bold, not font-bold. Names must match the
+     keys in src/theme/fonts.ts. */
+  --font-brand: PlusJakartaSans_400Regular;
+  --font-brand-medium: PlusJakartaSans_500Medium;
+  --font-brand-bold: PlusJakartaSans_700Bold;
+
+  /* ---- Type ramp (reference gives ranges; midpoints used) ---- */
+  --text-display: 60px; /* 56–64 · Bold */
+  --text-display--line-height: 1;
+  --text-heading: 30px; /* 28–32 · Bold */
+  --text-heading--line-height: 1.2;
+  --text-body: 16px; /* Regular */
+  --text-body--line-height: 1.5;
+  --text-caption: 14px; /* Medium (line height not specified; 1.4 assumed) */
+  --text-caption--line-height: 1.4;
+  --text-button: 17px; /* 17–18 · Medium (line height not specified; 1.25 assumed) */
+  --text-button--line-height: 1.25;
+
+  /* ---- Radii ---- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px; /* inputs, small cards */
+  --radius-xl: 24px; /* listing/policy cards, sheets */
+  --radius-2xl: 32px;
+  --radius-full: 9999px; /* buttons, chips, tab bar, icon buttons */
+}
