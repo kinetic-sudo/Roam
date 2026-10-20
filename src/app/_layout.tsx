@@ -5,12 +5,18 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
-import { fontAssets, headerFontFamily } from "@/theme/font";
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts(fontAssets);
+  // Runtime loading keeps Expo Go working. Once the app moves to a development
+  // build, switch to the expo-font config plugin (embeds the fonts at build time).
+  // Keys must match --font-jakarta* in src/global.css.
+  const [loaded, error] = useFonts({
+    "PlusJakartaSans-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
+    "PlusJakartaSans-Medium": require("../../assets/fonts/PlusJakartaSans-Medium.ttf"),
+    "PlusJakartaSans-SemiBold": require("../../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
+    "PlusJakartaSans-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
+  });
 
   useEffect(() => {
     if (loaded || error) {
@@ -23,9 +29,5 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <Stack
-      screenOptions={{ headerTitleStyle: { fontFamily: headerFontFamily } }}
-    />
-  );
+  return <Stack />;
 }
