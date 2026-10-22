@@ -5,7 +5,7 @@ import { CURVE_HEIGHT, SheetCurve } from "@/components/onboarding/onboarding-she
 import { PageDots } from "@/components/onboarding/onboardingb-page-dots";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { SLIDES } from "@/lib/onboarding/slides";
+import { onboardingSlides as SLIDES } from "@/lib/onboarding/slides";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -69,7 +69,7 @@ export default function Onboarding() {
       >
         {SLIDES.map((s) => (
           <View key={s.id} style={{ width, height }}>
-            <StyledImage source={{ uri: s.image }} contentFit="cover" transition={200} className="absolute inset-0" accessibilityLabel={s.location} />
+            <StyledImage source={{ uri: s.imageUrl }} contentFit="cover" transition={200} className="absolute inset-0" accessibilityLabel={s.location} />
             <View className="absolute left-6" style={{ bottom: sheetHeight + 20 }}>
               <LocationPill label={s.location} />
             </View>
