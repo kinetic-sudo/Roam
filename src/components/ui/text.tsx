@@ -7,6 +7,7 @@ import { toneClass, type Tone } from "./tones";
 const variants = {
   brand: "font-jakarta-extrabold text-brand",
   display: "font-jakarta-bold text-display",
+  wordmark: "font-wordmark text-brand",
   hero: "font-jakarta-extrabold text-hero",
     headline: "font-jakarta-bold text-headline",
   heading: "font-jakarta-bold text-heading",

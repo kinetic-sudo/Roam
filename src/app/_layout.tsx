@@ -1,5 +1,6 @@
 import "../global.css";
 
+import { Outfit_800ExtraBold } from "@expo-google-fonts/outfit";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -19,6 +20,7 @@ export default function RootLayout() {
     "PlusJakartaSans-SemiBold": require("../../assets/fonts/PlusJakartaSans-SemiBold.ttf"),
     "PlusJakartaSans-Bold": require("../../assets/fonts/PlusJakartaSans-Bold.ttf"),
     "PlusJakartaSans-ExtraBold": require("../../assets/fonts/PlusJakartaSans-ExtraBold.ttf"),
+    Outfit_800ExtraBold,
   });
 
   console.log("registry:", require("@react-native/assets-registry/registry"));

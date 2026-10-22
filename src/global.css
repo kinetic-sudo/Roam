@@ -39,11 +39,12 @@
   --font-jakarta-semibold: "PlusJakartaSans-SemiBold";
   --font-jakarta-bold: "PlusJakartaSans-Bold";
   --font-jakarta-extrabold: "PlusJakartaSans-ExtraBold";
+  --font-wordmark: "Outfit_800ExtraBold";
 
   /* Type ramp. Use through <Text variant>, not directly.
      Line heights are unitless ratios: NativeWind multiplies them by the font size. */
   --text-*: initial;
-  --text-brand: 26px; /* * onboarding wordmark */
+  --text-brand: 46px; /* * onboarding wordmark */
   --text-brand--line-height: 1; /* 26px */
   --text-brand--letter-spacing: -0.5px; /* * */
   --text-display: 56px;
