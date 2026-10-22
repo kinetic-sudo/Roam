@@ -4,43 +4,44 @@
     "slug": "Roam",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "roam",
     "userInterfaceStyle": "automatic",
-    "ios": {
-      "icon": "./assets/expo.icon"
-    },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "output": "server"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#FFFFFF"
         }
       ],
       "expo-image",
       "expo-status-bar",
       "expo-asset",
-      "expo-font"
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PlusJakartaSans-Regular.ttf",
+            "./assets/fonts/PlusJakartaSans-Medium.ttf",
+            "./assets/fonts/PlusJakartaSans-SemiBold.ttf",
+            "./assets/fonts/PlusJakartaSans-Bold.ttf",
+            "./assets/fonts/PlusJakartaSans-ExtraBold.ttf"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.kinetic12.Roam"
     }
   }
 }
