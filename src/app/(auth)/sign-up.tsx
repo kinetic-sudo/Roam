@@ -1,26 +1,26 @@
-import { Link, useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
+import { Icon } from "@/components/ui/icon";
+import { Text } from "@/components/ui/text";
+import { Link, useRouter } from "expo-router";
+import { Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Text } from "@/components/ui";
-
-export default function SignUpScreen() {
-  const { provider } = useLocalSearchParams<{ provider?: string }>();
-
+// Stub until Clerk is wired in.
+export default function SignUp() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   return (
-    <View className="flex-1 gap-6 bg-surface px-5 pt-6">
-      <View className="gap-3">
-        <Text variant="headline">Create your account</Text>
-        <Text tone="muted">
-          {provider === "google"
-            ? "Google sign-up will connect here once Clerk is wired up."
-            : "Email and password sign-up will live here. You reached this screen from onboarding."}
-        </Text>
-      </View>
-
-      <Button title="Continue" disabled />
-
-      <Link href="/sign-in" asChild>
-        <Text variant="label" tone="accent" className="text-center">
+    <View className="flex-1 bg-surface px-6" style={{ paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24 }}>
+      <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} className="size-10 justify-center">
+        <Icon name="arrowLeft" size={24} className="text-ink" />
+      </Pressable>
+      <Text variant="heading" className="mt-6 text-ink">
+        Create your account
+      </Text>
+      <Text variant="body" tone="muted" className="mt-3">
+        Sign-in with Clerk is coming next.
+      </Text>
+      <Link href="/sign-in" className="mt-6">
+        <Text variant="body" className="text-ink">
           Already have an account? Sign in
         </Text>
       </Link>
