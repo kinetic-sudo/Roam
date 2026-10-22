@@ -5,10 +5,10 @@ import { cn } from "@/lib/cn";
 import { toneClass, type Tone } from "./tones";
 
 const variants = {
-  brand: "font-jakarta-bold text-brand",
+  brand: "font-jakarta-extrabold text-brand",
   display: "font-jakarta-bold text-display",
-  hero: "font-jakarta-bold text-hero",
-  headline: "font-jakarta-bold text-headline",
+  hero: "font-jakarta-extrabold text-hero",
+    headline: "font-jakarta-bold text-headline",
   heading: "font-jakarta-bold text-heading",
   title: "font-jakarta-bold text-title",
   subtitle: "font-jakarta-semibold text-subtitle",

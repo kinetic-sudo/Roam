@@ -38,6 +38,7 @@
   --font-jakarta-medium: "PlusJakartaSans-Medium";
   --font-jakarta-semibold: "PlusJakartaSans-SemiBold";
   --font-jakarta-bold: "PlusJakartaSans-Bold";
+  --font-jakarta-extrabold: "PlusJakartaSans-ExtraBold";
 
   /* Type ramp. Use through <Text variant>, not directly.
      Line heights are unitless ratios: NativeWind multiplies them by the font size. */
