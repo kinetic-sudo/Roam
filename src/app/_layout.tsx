@@ -35,10 +35,7 @@ export default function RootLayout() {
   const iconSettings = { ios: "gearshape", android: "settings", web: "settings" } as const;
 
   return (
-    <Stack
-      screenOptions={{
-        headerTitleAlign: "center",
-      }}
+    <Stack screenOptions={{ headerShown: false }} 
     >
       <Stack.Screen
         name="index"
