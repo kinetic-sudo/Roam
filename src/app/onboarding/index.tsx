@@ -4,6 +4,7 @@ import { LocationPill } from "@/components/onboarding/onboarding-location-pill";
 import { CURVE_HEIGHT, SheetCurve } from "@/components/onboarding/onboarding-sheet-curve";
 import { PageDots } from "@/components/onboarding/onboardingb-page-dots";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { onboardingSlides as SLIDES } from "@/lib/onboarding/slides";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
@@ -100,12 +101,17 @@ export default function Onboarding() {
             </Animated.View>
           </View>
           <View className="mt-4 gap-3">
-            <Button variant="primary" trailingIcon="arrowRight" onPress={() => router.push("/sign-up")}>
-              Get started
-            </Button>
-            <Button variant="secondary" icon={<GoogleMark />} onPress={() => router.push("/sign-in")}>
-              Continue with Google
-            </Button>
+          <Button
+  title="Get started"
+  trailingIcon={<Icon name="arrowRight" size={20} className="text-ink" />}
+  onPress={() => router.push("/sign-up")}
+/>
+<Button
+  variant="secondary"
+  title="Continue with Google"
+  icon={<GoogleMark />}
+  onPress={() => router.push("/sign-in")}
+/>
           </View>
         </View>
       </View>
