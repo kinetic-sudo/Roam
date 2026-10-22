@@ -42,6 +42,9 @@
   /* Type ramp. Use through <Text variant>, not directly.
      Line heights are unitless ratios: NativeWind multiplies them by the font size. */
   --text-*: initial;
+  --text-brand: 26px; /* * onboarding wordmark */
+  --text-brand--line-height: 1; /* 26px */
+  --text-brand--letter-spacing: -0.5px; /* * */
   --text-display: 56px;
   --text-display--line-height: 1; /* 56px */
   --text-display--letter-spacing: -1px; /* * */
