@@ -1,119 +1,112 @@
-import { router } from "expo-router";
-import { useCallback, useRef, useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  useWindowDimensions,
-  View,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  type ViewToken,
-} from "react-native";
+import { Wordmark } from "@/components/brand/wordmark";
+import { GoogleMark } from "@/components/onboarding/onboarding-google-mark";
+import { LocationPill } from "@/components/onboarding/onboarding-location-pill";
+import { CURVE_HEIGHT, SheetCurve } from "@/components/onboarding/onboarding-sheet-curve";
+import { PageDots } from "@/components/onboarding/onboardingb-page-dots";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+import { SLIDES } from "@/lib/onboarding/slides";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
+import { Pressable, ScrollView, View, useWindowDimensions, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { styled } from "react-native-css"; // adjust to the project's `styled` import
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { OnboardingPrimaryCta } from "@/components/onboarding/onboarding-primary-cta";
-import { OnboardingProgress } from "@/components/onboarding/onboarding-progress";
-import { OnboardingSlidePage } from "@/components/onboarding/onboarding-slide-page";
-import { Button, Icon, Text } from "@/components/ui";
-import { onboardingSlides } from "@/lib/onboarding/slides";
+const StyledImage = styled(Image, { className: "style" });
+const StyledGlass = styled(GlassView, { className: "style" });
 
-const iconArrow = { ios: "arrow.right", android: "arrow_forward", web: "arrow_forward" } as const;
+const FADE_IN = FadeIn.duration(250); // motion.base
+const FADE_OUT = FadeOut.duration(150);
 
-function goToSignUp(provider?: "google") {
-  if (provider === "google") {
-    router.push({ pathname: "/sign-up", params: { provider: "google" } });
-    return;
-  }
-  router.push("/sign-up");
+function SkipPill({ onPress }: { onPress: () => void }) {
+  const label = (
+    <Text variant="buttonSecondary" className="text-ink">
+      Skip
+    </Text>
+  );
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="Skip onboarding" hitSlop={8}>
+      {isLiquidGlassAvailable() ? (
+        <StyledGlass className="h-10 items-center justify-center overflow-hidden rounded-full px-4">{label}</StyledGlass>
+      ) : (
+        <View className="h-10 items-center justify-center rounded-full bg-glass px-4">{label}</View>
+      )}
+    </Pressable>
+  );
 }
 
-export default function OnboardingScreen() {
-  const { width, height } = useWindowDimensions();
+export default function Onboarding() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const listRef = useRef<FlatList<(typeof onboardingSlides)[number]>>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { width, height } = useWindowDimensions();
+  const [index, setIndex] = useState(0);
+  const [sheetHeight, setSheetHeight] = useState(360);
+  const slide = SLIDES[index];
 
-  const imageHeight = Math.round(height * 0.52);
-  const slide = onboardingSlides[activeIndex]!;
-
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      const index = viewableItems[0]?.index;
-      if (index != null) {
-        setActiveIndex(index);
-      }
-    },
-    [],
-  );
-
-  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 60 }).current;
-
-  const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
-    setActiveIndex(index);
+  const onMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const next = Math.round(e.nativeEvent.contentOffset.x / width);
+    setIndex(Math.min(Math.max(next, 0), SLIDES.length - 1));
   };
 
   return (
     <View className="flex-1 bg-surface">
-      <View style={{ height: imageHeight }} className="relative">
-        <FlatList
-          ref={listRef}
-          data={onboardingSlides}
-          keyExtractor={(item) => item.location}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          bounces={false}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          onMomentumScrollEnd={onMomentumScrollEnd}
-          renderItem={({ item }) => (
-            <OnboardingSlidePage slide={item} width={width} imageHeight={imageHeight} />
-          )}
-        />
+      <StatusBar style="dark" />
 
-        <View
-          pointerEvents="box-none"
-          className="absolute inset-x-0 top-0 flex-row items-center justify-between px-5"
-          style={{ paddingTop: insets.top + 8 }}
-        >
-          <Text variant="brand">roam</Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Skip onboarding"
-            onPress={() => goToSignUp()}
-            className="rounded-full bg-glass px-4 py-2 active:opacity-70"
-          >
-            <Text variant="label" tone="muted">
-              Skip
-            </Text>
-          </Pressable>
-        </View>
+      {/* Photos: one full-screen page per slide, with its location pill */}
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        bounces={false}
+        contentInsetAdjustmentBehavior="never"
+        onMomentumScrollEnd={onMomentumEnd}
+        className="absolute inset-0"
+        style={{ width, height }}
+      >
+        {SLIDES.map((s) => (
+          <View key={s.id} style={{ width, height }}>
+            <StyledImage source={{ uri: s.image }} contentFit="cover" transition={200} className="absolute inset-0" accessibilityLabel={s.location} />
+            <View className="absolute left-6" style={{ bottom: sheetHeight + 20 }}>
+              <LocationPill label={s.location} />
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Fixed header */}
+      <View className="absolute inset-x-0 top-0 flex-row items-center justify-between px-6" style={{ paddingTop: insets.top + 16 }}>
+        <Wordmark />
+        <SkipPill onPress={() => router.push("/sign-in")} />
       </View>
 
-      <View className="-mt-6 flex-1 rounded-t-xl bg-surface px-5 pt-8 shadow-overlay corner-squircle">
-        <OnboardingProgress count={onboardingSlides.length} activeIndex={activeIndex} className="mb-8" />
-
-        <View className="gap-3">
-          <Text variant="hero">{slide.title}</Text>
-          <Text variant="lead" tone="muted">
-            {slide.body}
-          </Text>
-        </View>
-
-        <View className="mt-auto gap-3 pb-2" style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
-          <OnboardingPrimaryCta title="Get started" onPress={() => goToSignUp()} />
-          <Button
-            title="Continue with Google"
-            variant="secondary"
-            icon={
-              // Placeholder until the Google "G" logo asset is in assets/.
-              <Text variant="subtitle" tone="accent">
-                G
+      {/* Fixed bottom sheet */}
+      <View className="absolute inset-x-0 bottom-0" onLayout={(e) => setSheetHeight(e.nativeEvent.layout.height)}>
+        <SheetCurve />
+        <View className="absolute inset-x-0 bottom-0 bg-surface" style={{ top: CURVE_HEIGHT - 1 }} />
+        <View className="px-6 pt-7" style={{ paddingBottom: Math.max(insets.bottom, 24) }}>
+          <View className="px-1.5">
+            <PageDots count={SLIDES.length} index={index} />
+            <Animated.View key={slide.id} entering={FADE_IN} exiting={FADE_OUT}>
+              <Text variant="hero" className="mt-6 text-ink">
+                {slide.title}
               </Text>
-            }
-            onPress={() => goToSignUp("google")}
-          />
+              <Text variant="lead" tone="muted" className="mt-3">
+                {slide.body}
+              </Text>
+            </Animated.View>
+          </View>
+          <View className="mt-4 gap-3">
+            <Button variant="primary" trailingIcon="arrowRight" onPress={() => router.push("/sign-up")}>
+              Get started
+            </Button>
+            <Button variant="secondary" icon={<GoogleMark />} onPress={() => router.push("/sign-in")}>
+              Continue with Google
+            </Button>
+          </View>
         </View>
       </View>
     </View>

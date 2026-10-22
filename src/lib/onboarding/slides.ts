@@ -1,31 +1,37 @@
-export type OnboardingSlide = {
-  location: string;
-  /** Unsplash CDN URL (remote). */
-  imageUrl: string;
+// Sample content. Photos are free-to-use Unsplash placeholders (replaceable).
+// /download?w=1200 redirects to the image file; swap to images.unsplash.com/photo-…?w=1200&q=80
+// URLs if you prefer the CDN form (copy the image address from each photo page).
+const photo = (id: string) =>
+  `https://unsplash.com/photos/${id}/download?force=true&w=1200`;
+
+export type Slide = {
+  id: string;
   title: string;
   body: string;
+  image: string;
+  location: string;
 };
 
-export const onboardingSlides: OnboardingSlide[] = [
+export const SLIDES: Slide[] = [
   {
-    location: "Whistler, BC",
-    imageUrl:
-      "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80",
+    id: "find",
     title: "Find a stay that fits your story",
     body: "From mountain cabins to oceanfront villas, roam helps you find unforgettable stays for every kind of trip.",
+    image: photo("7ZTSZhPegaE"), // sunset over a lake and mountains, BC (Davey Gravy)
+    location: "Whistler, BC",
   },
   {
-    location: "Malibu, CA",
-    imageUrl:
-      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1200&q=80",
-    title: "Search in your own words",
-    body: "Describe the vibe, budget, and must-haves in one sentence. Roam ranks stays that match what you asked for.",
+    id: "ask",
+    title: "Just say what you're after",
+    body: "Describe your trip in one sentence, like a quiet cabin with a hot tub, and roam ranks the stays that fit.",
+    image: photo("36p0ByDskVk"), // mountain cabins at sunset (Johannes Kopf)
+    location: "Alpine cabins", // TODO: real place once confirmed
   },
   {
-    location: "Brooklyn, NY",
-    imageUrl:
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+    id: "answers",
     title: "Answers straight from the stay",
-    body: "Ask about check-in, pets, or cancellation and see the listing's own rules and Roam policies—word for word.",
+    body: "Ask about check-in, pets or cancellations and see the stay's own rules, word for word, with their source.",
+    image: photo("0CGST4j1X0g"), // cabin on a lake dock (Tim-Oliver Metz)
+    location: "Lakeside cabin", // TODO: real place once confirmed
   },
 ];
