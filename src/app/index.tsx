@@ -17,20 +17,19 @@ import {
   type IconName,
   type TextVariant,
 } from "@/components/ui";
-
 // Design system preview. Replace with the real home screen when it exists.
 // `?y=<offset>` opens it scrolled (a screenshot aid).
 
 // Class strings are literal so Tailwind can detect them.
 const palette = [
-  { name: "primary", cls: "bg-primary" },
-  { name: "lavender", cls: "bg-lavender" },
-  { name: "ink", cls: "bg-ink" },
-  { name: "ink-muted", cls: "bg-ink-muted" },
-  { name: "surface", cls: "bg-surface" },
-  { name: "surface-muted", cls: "bg-surface-muted" },
-  { name: "border", cls: "bg-border" },
-  { name: "glass", cls: "bg-glass" },
+  { name: "primary", label: "Primary Yellow", cls: "bg-primary" },
+  { name: "lavender", label: "Lavender", cls: "bg-lavender" },
+  { name: "ink", label: "Text Primary", cls: "bg-ink" },
+  { name: "ink-muted", label: "Text Secondary", cls: "bg-ink-muted" },
+  { name: "surface", label: "Surface White", cls: "bg-surface" },
+  { name: "surface-muted", label: "Surface Gray", cls: "bg-surface-muted" },
+  { name: "border", label: "Border Gray", cls: "bg-border" },
+  { name: "glass", label: "Glass Blur", cls: "bg-glass" },
 ] as const;
 
 const estimated = [
@@ -104,7 +103,7 @@ const iconMap: IconName = { ios: "map", android: "map", web: "map" };
 
 function Section({ number, title, children }: { number: string; title: string; children: ReactNode }) {
   return (
-    <View className="gap-4 rounded-xl bg-surface p-5 corner-squircle">
+    <View className="gap-5 rounded-xl bg-surface p-6 corner-squircle">
       <Text variant="title">
         {number}. {title}
       </Text>
@@ -113,11 +112,45 @@ function Section({ number, title, children }: { number: string; title: string; c
   );
 }
 
+function chunk<T>(items: readonly T[], size: number): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+  return rows;
+}
+
+function SwatchGrid({ swatches }: { swatches: readonly { label: string; cls: string }[] }) {
+  return (
+    <View className="gap-6">
+      {chunk(swatches, 3).map((row, rowIndex) => (
+        <View key={rowIndex} className="flex-row gap-4">
+          {row.map((s) => (
+            <View key={s.label} className="flex-1 gap-2">
+              <View className={`h-14 rounded-lg border border-border corner-squircle ${s.cls}`} />
+              <Text variant="footnote" className="text-center">
+                {s.label}
+              </Text>
+            </View>
+          ))}
+          {row.length < 3
+            ? Array.from({ length: 3 - row.length }, (_, padIndex) => (
+                <View key={`pad-${rowIndex}-${padIndex}`} className="flex-1" />
+              ))
+            : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function Swatch({ name, cls }: { name: string; cls: string }) {
   return (
-    <View className="w-24 gap-1">
-      <View className={`h-12 rounded-md border border-border corner-squircle ${cls}`} />
-      <Text variant="footnote">{name}</Text>
+    <View className="flex-1 gap-2">
+      <View className={`h-14 rounded-md border border-border corner-squircle ${cls}`} />
+      <Text variant="footnote" className="text-center">
+        {name}
+      </Text>
     </View>
   );
 }
@@ -135,7 +168,7 @@ export default function Index() {
   return (
     <ScrollView
       className="flex-1 bg-surface-muted"
-      contentContainerClassName="gap-4 px-5 py-6"
+      contentContainerClassName="gap-6 px-5 pb-8 pt-2"
       contentInsetAdjustmentBehavior="automatic"
       contentOffset={{ x: 0, y: Number(y) || 0 }}
     >
@@ -146,17 +179,22 @@ export default function Index() {
       </Section>
 
       <Section number="02" title="Color palette">
-        <View className="flex-row flex-wrap gap-4">
-          {palette.map((s) => (
-            <Swatch key={s.name} {...s} />
-          ))}
-        </View>
+        <SwatchGrid swatches={palette} />
         <Text variant="caption" tone="muted">
           Estimated from the image (not in the palette):
         </Text>
-        <View className="flex-row flex-wrap gap-4">
-          {estimated.map((s) => (
-            <Swatch key={s.name} {...s} />
+        <View className="gap-6">
+          {chunk(estimated, 3).map((row, rowIndex) => (
+            <View key={rowIndex} className="flex-row gap-4">
+              {row.map((s) => (
+                <Swatch key={s.name} {...s} />
+              ))}
+              {row.length < 3
+                ? Array.from({ length: 3 - row.length }, (_, padIndex) => (
+                    <View key={`est-pad-${rowIndex}-${padIndex}`} className="flex-1" />
+                  ))
+                : null}
+            </View>
           ))}
         </View>
       </Section>

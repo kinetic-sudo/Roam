@@ -4,6 +4,9 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { View } from "react-native";
+
+import { Icon } from "@/components/ui";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,5 +32,25 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Stack />;
+  const iconSettings = { ios: "gearshape", android: "settings", web: "settings" } as const;
+
+  return (
+    <Stack
+      screenOptions={{
+        headerTitleAlign: "center",
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Design system",
+          headerRight: () => (
+            <View className="mr-1 size-10 items-center justify-center rounded-full bg-info">
+              <Icon name={iconSettings} tone="inverse" size={22} />
+            </View>
+          ),
+        }}
+      />
+    </Stack>
+  );
 }
