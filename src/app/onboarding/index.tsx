@@ -103,7 +103,11 @@ export default function Onboarding() {
           <View className="mt-4 gap-3">
           <Button
   title="Get started"
-  trailingIcon={<Icon name="arrowRight" size={20} className="text-ink" />}
+  trailingIcon={
+    <View className="absolute right-6">
+      <Icon name={{ ios: "arrow.right", android: "arrow_forward", web: "arrow_forward" }} size={20} />
+    </View>
+  }
   onPress={() => router.push("/sign-up")}
 />
 <Button
