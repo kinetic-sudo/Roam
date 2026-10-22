@@ -49,11 +49,14 @@
   --font-jakarta-medium: PlusJakartaSans-Medium;
   --font-jakarta-semibold: PlusJakartaSans-SemiBold;
   --font-jakarta-bold: PlusJakartaSans-Bold;
+  --font-jakarta-extrabold: PlusJakartaSans-ExtraBold;
 
   /* ---- Type ramp. Line heights are unitless ratios (size/line-height in px):
      RC0 multiplies a px line height by the font size. ---- */
   --text-display: 56px; /* 56/56 Bold (sheet: 56–64) */
   --text-display--line-height: 1;
+  --text-brand: 64px; /* wordmark "roam" — ExtraBold, sheet upper range */
+  --text-brand--line-height: 1;
   --text-heading: 28px; /* 28/34 Bold (sheet: 28–32) */
   --text-heading--line-height: 1.2143;
   --text-title: 20px; /* 20/26 Bold, est. */

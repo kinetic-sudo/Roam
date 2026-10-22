@@ -174,7 +174,7 @@ export default function Index() {
     >
       <Section number="01" title="Brand">
         {/* Placeholder: the real wordmark asset is not in assets/ yet. */}
-        <Text variant="display">roam</Text>
+        <Text variant="brand">roam</Text>
         <Text tone="muted">Find unforgettable stays for every kind of trip.</Text>
       </Section>
 
