@@ -24,6 +24,12 @@
       "expo-status-bar",
       "expo-asset",
       [
+        "@clerk/expo",
+        {
+          "appleSignIn": false
+        }
+      ],
+      [
         "expo-font",
         {
           "fonts": [
@@ -34,7 +40,9 @@
             "./assets/fonts/PlusJakartaSans-ExtraBold.ttf"
           ]
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
