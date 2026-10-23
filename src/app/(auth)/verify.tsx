@@ -3,9 +3,9 @@ import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
-import { AuthFooter } from "@/components/auth/auth-footer";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { CodeInput } from "@/components/auth/code-input";
+import { AuthFooter } from "@/components/auth/footer";
 import { FormError } from "@/components/auth/form-error";
 import { Alert, Button } from "@/components/ui";
 import { clerkMessage } from "@/lib/auth/clerk-error";
