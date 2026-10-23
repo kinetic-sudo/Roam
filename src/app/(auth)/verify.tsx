@@ -1,21 +1,21 @@
+import { useSignUp } from "@clerk/expo";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
+import { AuthFooter } from "@/components/auth/auth-footer";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { CodeInput } from "@/components/auth/code-input";
-import { AuthFooter } from "@/components/auth/footer";
 import { FormError } from "@/components/auth/form-error";
 import { Alert, Button } from "@/components/ui";
-import { errorMessage, resendCode, verifyEmail } from "@/lib/auth/mock";
-import { useEnterApp } from "@/lib/auth/use-enter-app";
+import { clerkMessage } from "@/lib/auth/clerk-error";
 import { firstError, validateCode } from "@/lib/auth/validate";
 
 const RESEND_SECONDS = 30;
 
 export default function Verify() {
   const { email } = useLocalSearchParams<{ email?: string }>();
-  const enterApp = useEnterApp();
+  const { signUp } = useSignUp();
 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -40,13 +40,31 @@ export default function Verify() {
       setError(firstError(found, ["code"]));
       return;
     }
+
     setSubmitting(true);
     setNotice(null);
     try {
-      await verifyEmail({ email, code: digits });
-      enterApp();
+      const verified = await signUp.verifications.verifyEmailCode({ code: digits });
+      if (verified.error) {
+        setError(clerkMessage(verified.error));
+        setSubmitting(false);
+        return;
+      }
+      if (signUp.status !== "complete") {
+        setError("We couldn’t finish creating your account. Please start again.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Turns the finished sign-up into the active (and saved) session.
+      // The route guard then moves the guest to /home; no manual navigation needed.
+      const finalized = await signUp.finalize();
+      if (finalized.error) {
+        setError(clerkMessage(finalized.error));
+        setSubmitting(false);
+      }
     } catch (e) {
-      setError(errorMessage(e));
+      setError(clerkMessage(e));
       setSubmitting(false);
     }
   };
@@ -61,13 +79,17 @@ export default function Verify() {
     if (seconds > 0 || resending) return;
     setResending(true);
     try {
-      await resendCode({ email });
+      const sent = await signUp.verifications.sendEmailCode();
+      if (sent.error) {
+        setError(clerkMessage(sent.error));
+        return;
+      }
       setCode("");
       setError(null);
       setNotice(`We sent a new code to ${email}.`);
       setSeconds(RESEND_SECONDS);
     } catch (e) {
-      setError(errorMessage(e));
+      setError(clerkMessage(e));
     } finally {
       setResending(false);
     }
