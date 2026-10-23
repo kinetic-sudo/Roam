@@ -2,13 +2,13 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 
-import { AuthFooter } from "@/components/auth/auth-footer";
 import { AuthScreen } from "@/components/auth/auth-screen";
+import { AuthFooter } from "@/components/auth/footer";
 import { FormError } from "@/components/auth/form-error";
 import { authIcons } from "@/components/auth/icons";
-import { LabeledField } from "@/components/auth/labeled-field";
-import { OrDivider } from "@/components/auth/or-divider";
-import { SocialButtons } from "@/components/auth/social-buttons";
+import { LabeledField } from "@/components/auth/Labeled-field";
+import { OrDivider } from "@/components/auth/Or-divider";
+import { SocialButtons } from "@/components/auth/Social-button";
 import { Button, Icon } from "@/components/ui";
 import { errorMessage, signUp } from "@/lib/auth/mock";
 import { useEnterApp } from "@/lib/auth/use-enter-app";
