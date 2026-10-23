@@ -11,8 +11,6 @@ import { Icon } from "@/components/ui";
 
 SplashScreen.preventAutoHideAsync();
 
-console.log("RN AssetRegistry:", require("react-native").AssetRegistry);
-
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     "PlusJakartaSans-Regular": require("../../assets/fonts/PlusJakartaSans-Regular.ttf"),
