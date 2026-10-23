@@ -35,18 +35,15 @@ export function AuthScreen({ title, body, children, footer }: Props) {
       >
         <View>
           <View className="h-12 flex-row items-center justify-between">
-            {router.canGoBack() ? (
-              <Pressable
-                onPress={() => router.back()}
-                accessibilityRole="button"
-                accessibilityLabel="Back"
-                className="-ml-1 size-12 items-center justify-center rounded-full border border-border bg-surface active:opacity-70"
-              >
-                <Icon name={authIcons.arrowLeft} size={22} />
-              </Pressable>
-            ) : (
-              <View />
-            )}
+             <Pressable
+             onPress={() => (router.canGoBack() ? router.back() : router.replace("/onboarding"))}
+             accessibilityRole="button"
+             accessibilityLabel="Back"
+             className="-ml-1 size-12 items-center justify-center rounded-full border border-border bg-surface active:opacity-70"
+           >
+             <Icon name={authIcons.arrowLeft} size={22} />
+           </Pressable>
+         
             <Wordmark size="md" />
           </View>
 
