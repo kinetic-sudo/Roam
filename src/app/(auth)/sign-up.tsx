@@ -1,3 +1,4 @@
+import { useSignUp } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
@@ -10,15 +11,14 @@ import { LabeledField } from "@/components/auth/Labeled-field";
 import { OrDivider } from "@/components/auth/Or-divider";
 import { SocialButtons } from "@/components/auth/Social-button";
 import { Button, Icon } from "@/components/ui";
-import { errorMessage, signUp } from "@/lib/auth/mock";
-import { useEnterApp } from "@/lib/auth/use-enter-app";
+import { clerkMessage } from "@/lib/auth/clerk-error";
 import { firstError, validateSignUp } from "@/lib/auth/validate";
 
 type Field = "name" | "email" | "password";
 
 export default function SignUp() {
   const router = useRouter();
-  const enterApp = useEnterApp();
+  const { signUp } = useSignUp();
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
 
@@ -41,13 +41,34 @@ export default function SignUp() {
       setFormError(firstError(found, ["name", "email", "password"]));
       return;
     }
+
     setSubmitting(true);
     try {
-      const email = values.email.trim().toLowerCase();
-      await signUp({ name: values.name.trim(), email, password: values.password });
-      router.push({ pathname: "/verify", params: { email } });
+      const emailAddress = values.email.trim().toLowerCase();
+      const [firstName, ...rest] = values.name.trim().split(/\s+/);
+      const lastName = rest.join(" ");
+
+      // 1. Create the sign-up attempt.
+      const created = await signUp.password({
+        emailAddress,
+        password: values.password,
+        firstName,
+        lastName: lastName || undefined,
+      });
+      if (created.error) {
+        setFormError(clerkMessage(created.error));
+        return;
+      }
+
+      // 2. Email the 6-digit code, then move to the verify screen.
+      const sent = await signUp.verifications.sendEmailCode();
+      if (sent.error) {
+        setFormError(clerkMessage(sent.error));
+        return;
+      }
+      router.push({ pathname: "/verify", params: { email: emailAddress } });
     } catch (e) {
-      setFormError(errorMessage(e));
+      setFormError(clerkMessage(e));
     } finally {
       setSubmitting(false);
     }
@@ -115,7 +136,7 @@ export default function SignUp() {
       </View>
 
       <OrDivider />
-      <SocialButtons disabled={submitting} onSuccess={enterApp} onError={setFormError} />
+      <SocialButtons disabled={submitting} onError={setFormError} />
     </AuthScreen>
   );
 }
