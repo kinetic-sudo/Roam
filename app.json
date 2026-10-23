@@ -25,6 +25,7 @@
       "expo-asset",
       [
         "expo-font",
+        ["@clerk/expo", { "appleSignIn": false }],
         {
           "fonts": [
             "./assets/fonts/PlusJakartaSans-Regular.ttf",
