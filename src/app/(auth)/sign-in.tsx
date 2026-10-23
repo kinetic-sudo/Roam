@@ -1,24 +1,24 @@
+import { useSignIn } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 
+import { AuthFooter } from "@/components/auth/auth-footer";
 import { AuthScreen } from "@/components/auth/auth-screen";
-import { AuthFooter } from "@/components/auth/footer";
 import { FormError } from "@/components/auth/form-error";
 import { authIcons } from "@/components/auth/icons";
-import { LabeledField } from "@/components/auth/Labeled-field";
-import { OrDivider } from "@/components/auth/Or-divider";
-import { SocialButtons } from "@/components/auth/Social-button";
+import { LabeledField } from "@/components/auth/labeled-field";
+import { OrDivider } from "@/components/auth/or-divider";
+import { SocialButtons } from "@/components/auth/social-buttons";
 import { Button, Icon } from "@/components/ui";
-import { errorMessage, signIn } from "@/lib/auth/mock";
-import { useEnterApp } from "@/lib/auth/use-enter-app";
+import { clerkMessage } from "@/lib/auth/clerk-error";
 import { firstError, validateSignIn } from "@/lib/auth/validate";
 
 type Field = "email" | "password";
 
 export default function SignIn() {
   const router = useRouter();
-  const enterApp = useEnterApp();
+  const { signIn } = useSignIn();
   const passwordRef = useRef<TextInput>(null);
 
   const [values, setValues] = useState({ email: "", password: "" });
@@ -40,12 +40,33 @@ export default function SignIn() {
       setFormError(firstError(found, ["email", "password"]));
       return;
     }
+
     setSubmitting(true);
     try {
-      await signIn({ email: values.email.trim().toLowerCase(), password: values.password });
-      enterApp();
+      const attempt = await signIn.password({
+        emailAddress: values.email.trim().toLowerCase(),
+        password: values.password,
+      });
+      if (attempt.error) {
+        setFormError(clerkMessage(attempt.error));
+        setSubmitting(false);
+        return;
+      }
+      if (signIn.status !== "complete") {
+        // e.g. a second factor was switched on in the Clerk dashboard.
+        setFormError("This account needs an extra verification step that the app doesn’t support yet.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Activates and saves the session. The route guard then moves the guest to /home.
+      const finalized = await signIn.finalize();
+      if (finalized.error) {
+        setFormError(clerkMessage(finalized.error));
+        setSubmitting(false);
+      }
     } catch (e) {
-      setFormError(errorMessage(e));
+      setFormError(clerkMessage(e));
       setSubmitting(false);
     }
   };
@@ -97,7 +118,7 @@ export default function SignIn() {
       </View>
 
       <OrDivider />
-      <SocialButtons disabled={submitting} onSuccess={enterApp} onError={setFormError} />
+      <SocialButtons disabled={submitting} onError={setFormError} />
     </AuthScreen>
   );
 }
