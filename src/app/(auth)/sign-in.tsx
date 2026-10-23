@@ -8,7 +8,7 @@ import { FormError } from "@/components/auth/form-error";
 import { authIcons } from "@/components/auth/icons";
 import { LabeledField } from "@/components/auth/Labeled-field";
 import { OrDivider } from "@/components/auth/Or-divider";
-import { SocialButtons } from "@/components/auth/social-buttons";
+import { SocialButtons } from "@/components/auth/Social-button";
 import { Button, Icon } from "@/components/ui";
 import { errorMessage, signIn } from "@/lib/auth/mock";
 import { useEnterApp } from "@/lib/auth/use-enter-app";
