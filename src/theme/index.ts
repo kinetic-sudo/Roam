@@ -1,1 +1,9 @@
-export { motion, spring } from "./motion";
+export {
+  css,
+  easeInOut,
+  easeOut,
+  motion,
+  press,
+  spring,
+  stagger,
+} from "./motion";
