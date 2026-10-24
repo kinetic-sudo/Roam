@@ -1,17 +1,23 @@
+import { useSSO } from "@clerk/expo";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
 import { ActivityIndicator, Platform, Pressable, View } from "react-native";
 
 import { GoogleMark } from "@/components/onboarding/onboarding-google-mark";
 import { Icon, Text } from "@/components/ui";
-import { errorMessage, signInWithProvider } from "@/lib/auth/mock";
+import { clerkMessage } from "@/lib/auth/clerk-error";
 
 import { authIcons } from "./icons";
 
+// Lets the in-app browser hand control back to the app when the provider redirects.
+WebBrowser.maybeCompleteAuthSession();
+
 type Provider = "google" | "apple";
+const strategies = { google: "oauth_google", apple: "oauth_apple" } as const;
 
 type Props = {
   disabled?: boolean;
-  onSuccess: () => void;
   onError: (message: string) => void;
 };
 
@@ -34,17 +40,24 @@ function Row({ title, mark, loading, disabled, onPress }: { title: string; mark:
   );
 }
 
-export function SocialButtons({ disabled, onSuccess, onError }: Props) {
+export function SocialButtons({ disabled, onError }: Props) {
+  const { startSSOFlow } = useSSO();
   const [busy, setBusy] = useState<Provider | null>(null);
 
   const run = async (provider: Provider) => {
     if (busy) return;
     setBusy(provider);
     try {
-      await signInWithProvider(provider);
-      onSuccess();
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy: strategies[provider],
+        redirectUrl: AuthSession.makeRedirectUri(),
+      });
+      // No session id means the guest closed the browser: stay put, no error.
+      // With a session, the route guard moves them to /home on its own.
+      if (createdSessionId && setActive) await setActive({ session: createdSessionId });
     } catch (e) {
-      onError(errorMessage(e));
+      onError(clerkMessage(e));
+    } finally {
       setBusy(null);
     }
   };
