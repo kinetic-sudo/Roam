@@ -45,7 +45,7 @@ function Routes() {
 
       {/* Signed-in only. Deep links here while signed out fall back to index. */}
       <Stack.Protected guard={signedIn}>
-        <Stack.Screen name="home" />
+        <Stack.Screen name="(app)" />
       </Stack.Protected>
 
       <Stack.Screen
