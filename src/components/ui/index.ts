@@ -4,6 +4,7 @@ export { Button } from "./button";
 export { Chip } from "./chip";
 export { Icon, type IconName } from "./icon";
 export { IconButton } from "./icon-button";
+export { PressableScale } from "./pressable-scale";
 export { SegmentedControl, type SegmentOption } from "./segmented-control";
 export { Stepper } from "./stepper";
 export { Text, type TextVariant } from "./text";
