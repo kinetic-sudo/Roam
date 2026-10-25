@@ -1,7 +1,8 @@
+import { BlurView } from "expo-blur";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { TabList, TabSlot, TabTrigger, Tabs, type TabTriggerSlotProps } from "expo-router/ui";
 import type { ReactNode } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { styled } from "react-native-css";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,11 +12,15 @@ import { cn } from "@/lib/cn";
 import { tapSelection } from "@/lib/haptics";
 import { css, press } from "@/theme";
 
-// Custom floating tab bar built on Expo Router's headless tabs (expo-router/ui).
-// NativeTabs can't draw the design's floating capsule or the yellow circle behind the selected tab.
+// Floating glass tab bar (expo-router/ui headless tabs), styled after the iOS 26 Liquid Glass bar.
+//   iOS 26+  : real Liquid Glass (GlassView)
+//   iOS < 26 : a blurred, frosted capsule (BlurView)
+//   Android  : a translucent capsule
+// Needs: npx expo install expo-blur, then a native rebuild.
 
 const AnimatedView = styled(Animated.View, { className: "style" });
 const StyledGlass = styled(GlassView, { className: "style" });
+const StyledBlur = styled(BlurView, { className: "style" });
 
 const icons = {
   home: { ios: "house", android: "home", web: "home" },
@@ -33,49 +38,61 @@ type TabButtonProps = TabTriggerSlotProps & {
   selectedIcon?: IconName;
 };
 
-/** One tab: the yellow circle fades in behind the selected tab (opacity, 150 ms). */
+/** One tab. The selected one gets a soft grey capsule that fades in (opacity, 150 ms). */
 function TabButton({ label, icon, selectedIcon, isFocused, href: _href, style: _style, onPress, ...props }: TabButtonProps) {
   return (
-    <PressableScale
-      {...props}
-      onPress={(e) => {
-        if (!isFocused) tapSelection(); // same frame as the tab changing
-        onPress?.(e);
-      }}
-      accessibilityRole="tab"
-      accessibilityLabel={label}
-      accessibilityState={{ selected: !!isFocused }}
-      className="size-18 items-center justify-center"
-    >
-      <AnimatedView
-        className="absolute inset-0 rounded-full bg-primary"
-        style={{
-          opacity: isFocused ? 1 : 0,
-          transitionProperty: "opacity",
-          transitionDuration: press.colorDurationCss,
-          transitionTimingFunction: css.easeOut,
+    <View className="flex-1">
+      <PressableScale
+        {...props}
+        onPress={(e) => {
+          if (!isFocused) tapSelection(); // same frame as the tab changing
+          onPress?.(e);
         }}
-      />
-      <Icon name={isFocused && selectedIcon ? selectedIcon : icon} size={26} />
-      <Text variant="footnote" className="mt-0.5">
-        {label}
-      </Text>
-    </PressableScale>
+        accessibilityRole="tab"
+        accessibilityLabel={label}
+        accessibilityState={{ selected: !!isFocused }}
+        className="h-14 items-center justify-center"
+      >
+        {/* Selection highlight: ink at 10% opacity, so it reads as a darker patch of the glass. */}
+        <AnimatedView
+          className="absolute inset-0 rounded-full bg-ink"
+          style={{
+            opacity: isFocused ? 0.1 : 0,
+            transitionProperty: "opacity",
+            transitionDuration: press.colorDurationCss,
+            transitionTimingFunction: css.easeOut,
+          }}
+        />
+        <Icon name={isFocused && selectedIcon ? selectedIcon : icon} size={24} />
+        <Text variant="footnote" className="mt-0.5">
+          {label}
+        </Text>
+      </PressableScale>
+    </View>
   );
 }
 
-/** The floating capsule. Real Liquid Glass on iOS 26, a translucent bar elsewhere. */
-function FloatingBar({ children }: { children?: ReactNode }) {
+/** The capsule: glass material + position. */
+function GlassBar({ children }: { children?: ReactNode }) {
   const insets = useSafeAreaInsets();
-  const row = "h-20 flex-row items-center justify-around rounded-full px-3";
+  const capsule = "h-16 flex-row items-center rounded-full px-1.5 overflow-hidden border border-glass";
+
+  let bar: ReactNode;
+  if (isLiquidGlassAvailable()) {
+    bar = <StyledGlass className={capsule}>{children}</StyledGlass>;
+  } else if (Platform.OS === "ios") {
+    bar = (
+      <StyledBlur intensity={70} tint="systemThinMaterialLight" className={capsule}>
+        {children}
+      </StyledBlur>
+    );
+  } else {
+    bar = <View className={cn(capsule, "bg-glass")}>{children}</View>;
+  }
 
   return (
-    <View pointerEvents="box-none" className="absolute inset-x-0 bottom-0 px-4" style={{ paddingBottom: Math.max(insets.bottom, 12) }}>
-      {isLiquidGlassAvailable() ? (
-        <StyledGlass className={row}>{children}</StyledGlass>
-      ) : (
-        <View className={cn(row, "border border-border bg-glass shadow-overlay")}>{children}</View>
-      )}
+    <View pointerEvents="box-none" className="absolute inset-x-0 bottom-0 px-3" style={{ paddingBottom: Math.max(insets.bottom - 10, 12) }}>
+      {bar}
     </View>
   );
 }
@@ -86,7 +103,7 @@ export default function AppLayout() {
     <Tabs activityEnabled style={{ flex: 1 }}>
       <TabSlot />
       <TabList asChild>
-        <FloatingBar>
+        <GlassBar>
           <TabTrigger name="home" href="/home" asChild>
             <TabButton label="Home" icon={icons.home} selectedIcon={icons.homeFill} />
           </TabTrigger>
@@ -99,7 +116,7 @@ export default function AppLayout() {
           <TabTrigger name="profile" href="/profile" asChild>
             <TabButton label="Profile" icon={icons.profile} selectedIcon={icons.profileFill} />
           </TabTrigger>
-        </FloatingBar>
+        </GlassBar>
       </TabList>
     </Tabs>
   );
