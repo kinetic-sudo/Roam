@@ -33,7 +33,7 @@ export function CategoryChips({ value, onChange }: { value: Category; onChange: 
               tapSelection(); // same frame as the colour change
               onChange(chip.id);
             }}
-            className={cn("h-12 flex-row items-center gap-2 rounded-full px-5", selected ? "bg-primary" : "bg-surface-muted")}
+            className={cn("h-12 flex-row items-center gap-2 rounded-full px-4", selected ? "bg-primary" : "bg-surface-muted")}
           >
             <Icon name={chip.icon} size={22} />
             <Text variant="label">{chip.label}</Text>
