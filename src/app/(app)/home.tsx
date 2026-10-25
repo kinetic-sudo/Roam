@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, LinearTransition, ReduceMotion } from "react-native-reanimated";
 
+import { Wordmark } from "@/components/brand/wordmark";
 import { CategoryChips, type Category } from "@/components/home/category-chips";
 import { Avatar } from "@/components/stays/avatar";
 import { stayIcons } from "@/components/stays/icons";
@@ -44,9 +45,8 @@ export default function Home() {
       keyboardDismissMode="on-drag"
       contentContainerClassName="px-5 pb-32 pt-2"
     >
-      <View className="flex-row items-start justify-between">
-        {/* PLACEHOLDER: the real roam wordmark asset */}
-        <Text variant="display">roam</Text>
+      <View className="flex-row items-center justify-between">
+        <Wordmark size="xl" />
         <Avatar />
       </View>
 
