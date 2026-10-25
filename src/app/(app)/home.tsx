@@ -5,8 +5,8 @@ import { ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, LinearTransition, ReduceMotion } from "react-native-reanimated";
 
 import { CategoryChips, type Category } from "@/components/home/category-chips";
-import { Avatar } from "@/components/stays/avatar";
 import { stayIcons } from "@/components/stays/icons";
+import { Avatar } from "@/components/stays/avatar";
 import { PropertyCard } from "@/components/stays/property-card";
 import { SearchPrompt, SUGGESTION } from "@/components/stays/search-prompt";
 import { Icon, PressableScale, Text } from "@/components/ui";
@@ -42,7 +42,7 @@ export default function Home() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
-      contentContainerClassName="px-5 pb-8 pt-2"
+      contentContainerClassName="px-5 pb-32 pt-2"
     >
       <View className="flex-row items-start justify-between">
         {/* PLACEHOLDER: the real roam wordmark asset */}
