@@ -44,9 +44,8 @@ export default function Home() {
       keyboardDismissMode="on-drag"
       contentContainerClassName="px-5 pb-32 pt-2"
     >
-      <View className="flex-row items-start justify-between">
-        {/* PLACEHOLDER: the real roam wordmark asset */}
-        <Text variant="display">roam</Text>
+      <View className="flex-row items-center justify-between">
+       <Text variant="hero">Roam</Text>
         <Avatar />
       </View>
 
@@ -56,7 +55,7 @@ export default function Home() {
 
       <View className="mt-1 flex-row items-center gap-4">
         {/* Needs the `jumbo` variant in text.tsx (see SETUP-HOME.md) */}
-        <Text variant="jumbo" className="flex-1">
+        <Text variant="headline" className="flex-1">
           {"Find your\nnext stay"}
         </Text>
         <PressableScale

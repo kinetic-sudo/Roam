@@ -1,4 +1,3 @@
-import { Wordmark } from "@/components/brand/wordmark";
 import { GoogleMark } from "@/components/onboarding/onboarding-google-mark";
 import { LocationPill } from "@/components/onboarding/onboarding-location-pill";
 import { CURVE_HEIGHT, SheetCurve } from "@/components/onboarding/onboarding-sheet-curve";
@@ -80,7 +79,8 @@ export default function Onboarding() {
 
       {/* Fixed header */}
       <View className="absolute inset-x-0 top-0 flex-row items-center justify-between px-6" style={{ paddingTop: insets.top + 16 }}>
-        <Wordmark />
+        <Text variant="brand">Roam</Text>
+        {/* <Wordmark/> */}
         <SkipPill onPress={() => router.push("/sign-in")} />
       </View>
 

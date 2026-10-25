@@ -43,8 +43,8 @@ export function SearchPrompt({ value, onChangeText, onSubmit, fallback, placehol
         autoFocus={autoFocus}
         autoCorrect={false}
         accessibilityLabel="Describe your stay"
-        // No text-* size class on purpose: a line height makes iOS draw a second line in a single-line input.
-        className="flex-1 font-jakarta-medium text-ink"
+        // text-prompt has no line height on purpose: a line height makes iOS draw a second line in a single-line input.
+        className="flex-1 font-jakarta-medium text-prompt text-ink"
       />
       <PressableScale
         onPress={send}
