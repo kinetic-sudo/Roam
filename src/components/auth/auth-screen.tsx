@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Wordmark } from "@/components/brand/wordmark";
 import { Icon, Text } from "@/components/ui";
 
 import { authIcons } from "./icons";
@@ -44,7 +43,7 @@ export function AuthScreen({ title, body, children, footer }: Props) {
              <Icon name={authIcons.arrowLeft} size={22} />
            </Pressable>
          
-            <Wordmark size="md" />
+           <Text variant="hero">Roam</Text>
           </View>
 
           <Text variant="headline" className="mt-8">
