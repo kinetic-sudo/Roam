@@ -5,8 +5,8 @@ import { ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, LinearTransition, ReduceMotion } from "react-native-reanimated";
 
 import { CategoryChips, type Category } from "@/components/home/category-chips";
-import { stayIcons } from "@/components/stays/icons";
 import { Avatar } from "@/components/stays/avatar";
+import { stayIcons } from "@/components/stays/icons";
 import { PropertyCard } from "@/components/stays/property-card";
 import { SearchPrompt, SUGGESTION } from "@/components/stays/search-prompt";
 import { Icon, PressableScale, Text } from "@/components/ui";
