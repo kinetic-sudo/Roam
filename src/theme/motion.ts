@@ -15,8 +15,13 @@ export const easeOut = Easing.bezier(0.23, 1, 0.32, 1);
 /** Ease-in-out for things moving on screen (list reflow). */
 export const easeInOut = Easing.bezier(0.77, 0, 0.175, 1);
 
-/** Same curve as a CSS string, for Reanimated CSS transitions. */
-export const css = { easeOut: "cubic-bezier(0.23, 1, 0.32, 1)" } as const;
+/**
+ * Timing function for Reanimated CSS transitions (`transitionTimingFunction`) on a `className`-styled view.
+ * Must be one of the named curves (ease, ease-out, ...): a "cubic-bezier(...)" string is rejected, and a
+ * `cubicBezier()` object loses its methods when `styled()` copies the style. Layout animations
+ * (`easeOut` / `easeInOut` above) are not affected and keep their custom curves.
+ */
+export const css = { easeOut: "ease-out" } as const;
 
 /** Press feedback: near-imperceptible by design (it happens tens of times a day). */
 export const press = {

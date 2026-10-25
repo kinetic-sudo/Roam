@@ -9,7 +9,7 @@ export default function Trips() {
     <ScrollView
       className="flex-1 bg-surface"
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerClassName="grow items-center justify-center gap-2 px-5"
+      contentContainerClassName="grow items-center justify-center gap-2 px-5 pb-32"
     >
       <Icon name={stayIcons.calendar} size={40} />
       <Text variant="title" className="mt-2">

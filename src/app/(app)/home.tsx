@@ -42,7 +42,7 @@ export default function Home() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
-      contentContainerClassName="px-5 pb-8 pt-2"
+      contentContainerClassName="px-5 pb-32 pt-2"
     >
       <View className="flex-row items-start justify-between">
         {/* PLACEHOLDER: the real roam wordmark asset */}

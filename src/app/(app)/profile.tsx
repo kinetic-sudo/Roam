@@ -26,7 +26,7 @@ export default function Profile() {
     <ScrollView
       className="flex-1 bg-surface"
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerClassName="px-5 pb-8 pt-2"
+      contentContainerClassName="px-5 pb-32 pt-2"
     >
       <View className="items-center gap-1 pt-6">
         <Avatar />
