@@ -8,6 +8,7 @@ const variants = {
   brand: "font-jakarta-extrabold text-brand",
   display: "font-jakarta-bold text-display",
   wordmark: "font-wordmark text-brand",
+  wordmarkXl: "font-wordmark text-display",
   jumbo: "font-jakarta-bold text-jumbo",
   hero: "font-jakarta-extrabold text-hero",
     headline: "font-jakarta-bold text-headline",

@@ -47,6 +47,7 @@
   --text-brand: 46px; /* * onboarding wordmark */
   --text-brand--line-height: 1; /* 26px */
   --text-brand--letter-spacing: -0.5px; /* * */
+  --text-prompt: 15px; /* prompt bar input; no line height (single-line TextInput) */
   --text-display: 56px;
   --text-display--line-height: 1; /* 56px */
   --text-display--letter-spacing: -1px; /* * */
