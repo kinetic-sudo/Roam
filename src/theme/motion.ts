@@ -1,4 +1,4 @@
-import { cubicBezier, Easing } from "react-native-reanimated";
+import { Easing } from "react-native-reanimated";
 
 /** Durations (ms). Mobile UI motion stays under 300 ms. */
 export const motion = {
@@ -16,11 +16,12 @@ export const easeOut = Easing.bezier(0.23, 1, 0.32, 1);
 export const easeInOut = Easing.bezier(0.77, 0, 0.175, 1);
 
 /**
- * Same curve for Reanimated CSS transitions (`transitionTimingFunction`).
- * These only accept the named curves (ease, ease-out, ...) or a `cubicBezier()` object,
- * never a "cubic-bezier(...)" string.
+ * Timing function for Reanimated CSS transitions (`transitionTimingFunction`) on a `className`-styled view.
+ * Must be one of the named curves (ease, ease-out, ...): a "cubic-bezier(...)" string is rejected, and a
+ * `cubicBezier()` object loses its methods when `styled()` copies the style. Layout animations
+ * (`easeOut` / `easeInOut` above) are not affected and keep their custom curves.
  */
-export const css = { easeOut: cubicBezier(0.23, 1, 0.32, 1) } as const;
+export const css = { easeOut: "ease-out" } as const;
 
 /** Press feedback: near-imperceptible by design (it happens tens of times a day). */
 export const press = {
