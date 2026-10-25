@@ -38,7 +38,7 @@ type TabButtonProps = TabTriggerSlotProps & {
   selectedIcon?: IconName;
 };
 
-/** One tab. The selected one gets a soft grey capsule that fades in (opacity, 150 ms). */
+/** One tab. The selected one gets a yellow capsule that fades in (opacity, 150 ms). */
 function TabButton({ label, icon, selectedIcon, isFocused, href: _href, style: _style, onPress, ...props }: TabButtonProps) {
   return (
     <View className="flex-1">
@@ -53,11 +53,11 @@ function TabButton({ label, icon, selectedIcon, isFocused, href: _href, style: _
         accessibilityState={{ selected: !!isFocused }}
         className="h-14 items-center justify-center"
       >
-        {/* Selection highlight: ink at 10% opacity, so it reads as a darker patch of the glass. */}
+        {/* Selection highlight: the brand yellow, fading in behind the current screen's tab. */}
         <AnimatedView
-          className="absolute inset-0 rounded-full bg-ink"
+          className="absolute inset-0 rounded-full bg-primary"
           style={{
-            opacity: isFocused ? 0.1 : 0,
+            opacity: isFocused ? 1 : 0,
             transitionProperty: "opacity",
             transitionDuration: press.colorDurationCss,
             transitionTimingFunction: css.easeOut,
