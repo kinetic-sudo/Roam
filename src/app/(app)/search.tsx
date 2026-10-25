@@ -61,7 +61,7 @@ export default function Search() {
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
-      contentContainerClassName="px-5 pb-8 pt-2"
+      contentContainerClassName="px-5 pb-32 pt-2"
     >
       <SearchPrompt ref={inputRef} value={text} onChangeText={setText} onSubmit={submit} />
 
