@@ -8,7 +8,7 @@ import { stayIcons } from "@/components/stays/icons";
 import { PropertyRow } from "@/components/stays/property-row";
 import { QueryChips } from "@/components/stays/query-chips";
 import { rowIcons } from "@/components/stays/row-icons";
-import { SearchField } from "@/components/stays/search-field";
+import { SearchField } from "@/components/stays/search-feilds";
 import { SortControl } from "@/components/stays/sort-control";
 import { Button, Icon, PressableScale, Text } from "@/components/ui";
 import { tapImpact } from "@/lib/haptics";
