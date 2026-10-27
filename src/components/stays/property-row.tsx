@@ -9,7 +9,7 @@ import { tapSelection } from "@/lib/haptics";
 
 import type { Tag } from "./amenities";
 import { rowIcons } from "./row-icons";
-import { StarIcon } from "./star-icon";
+import { StarIcon } from "./star-icons";
 
 const StyledImage = styled(Image, { className: "style" });
 
