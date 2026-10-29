@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import Animated, { FadeInDown, LinearTransition, ReduceMotion } from "react-native-reanimated";
 
-import { highlightTags } from "@/components/stays/amenities";
 import { stayIcons } from "@/components/stays/icons";
-import { PropertyRow } from "@/components/stays/property-row";
+import { PropertyCard } from "@/components/stays/property-card";
 import { QueryChips } from "@/components/stays/query-chips";
 import { rowIcons } from "@/components/stays/row-icons";
 import { SearchField } from "@/components/stays/search-feilds";
@@ -89,12 +88,12 @@ export default function Search() {
       {results.length > 0 ? (
         <>
           <SortControl count={results.length} value={sort} onChange={setSort} />
-          <View className="mt-5 gap-6">
+          <View className="mt-5 gap-5">
             {results.map((p, i) => (
               // Keyed by query: every new search remounts the rows, so the stagger replays.
               // Re-sorting keeps the keys, so the rows move instead.
               <Animated.View key={`${query}|${p.id}`} entering={ROW_IN[Math.min(i, MAX_STAGGER_INDEX)]} layout={ROW_REFLOW}>
-                <PropertyRow property={p} tags={highlightTags(p, parsed)} />
+                <PropertyCard property={p} />
               </Animated.View>
             ))}
           </View>
