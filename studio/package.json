@@ -9,7 +9,10 @@
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "dev": "sanity dev",
-    "start": "sanity start"
+    "start": "sanity start",
+    "seed": "sanity exec scripts/seed.ts --with-user-token",
+    "seed:dry": "sanity exec scripts/seed.ts --with-user-token -- --dry-run",
+    "check": "tsx scripts/check-data.ts && tsx scripts/seed-core.test.ts && tsx scripts/schema-fit.test.ts"
   },
   "keywords": [
     "sanity"
@@ -26,6 +29,7 @@
     "@types/react": "^19.2.14",
     "eslint": "^10.8.1",
     "prettier": "^3.5",
+    "tsx": "^4.23.15",
     "typescript": "~6.0"
   },
   "prettier": {
