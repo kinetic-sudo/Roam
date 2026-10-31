@@ -1,7 +1,7 @@
 import type { SanityClient } from '@sanity/client'
 import { getCliClient } from 'sanity/cli'
 
-import { formatReport, runSeed, type Doc, type Store } from './seed-core.test'
+import { formatReport, runSeed, type Doc, type Store } from './seed-core'
 
 // Seeds Roam's content: 8 policies, 12 hosts, 30 stays, 90 reviews. Safe to run more than once.
 //
