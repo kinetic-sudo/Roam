@@ -1,4 +1,4 @@
-import { hosts } from '../seed/hosts'
+import { hosts } from '../seed/host'
 import { policies } from '../seed/policies'
 import { reviews } from '../seed/reviews'
 import { stays } from '../seed/stays'
