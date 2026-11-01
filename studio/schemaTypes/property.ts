@@ -1,4 +1,4 @@
-import { HomeIcon } from '@sanity/icons'
+import { HomeIcon } from '@sanity/icons/Home'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 /** Fixed amenity list: guest filters key off these values, so they are never free text. */
