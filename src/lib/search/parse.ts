@@ -1,100 +1,146 @@
-import type { Amenity, PropertyType } from "@/data/properties";
+// src/lib/search/parse.ts
+import { Amenity, PropertyType } from "../stays";
 
-export type ParsedQuery = {
+export interface ParsedQuery {
+  type?: PropertyType;
   maxPrice?: number;
   guests?: number;
-  type?: PropertyType;
-  amenities: Amenity[];
   pets?: boolean;
-  /** Everything left over: soft words like "quiet" or "cozy" that rank instead of filter. */
-  terms: string[];
+  amenities: Amenity[];
+  place?: string;
+  placeAlt?: string;
+  vibes: string[];
+  rawText: string;
+}
+
+const US_STATES: Record<string, string> = {
+  california: "CA",
+  "new york": "NY",
+  texas: "TX",
+  florida: "FL",
+  washington: "WA",
+  oregon: "OR",
+  colorado: "CO",
+  // Add other states as needed
 };
 
-// Stand-in for the AI pipeline. In Sanity this becomes GROQ params + embeddings.
+const AMENITY_KEYWORDS: Record<string, Amenity> = {
+  "hot tub": "hotTub",
+  pool: "pool",
+  fireplace: "fireplace",
+  "fire pit": "firePit",
+  sauna: "sauna",
+  wifi: "wifi",
+  kitchen: "kitchen",
+  workspace: "workspace",
+  parking: "parking",
+  washer: "washer",
+  ac: "ac",
+  "ocean view": "oceanView",
+  "lake view": "lakeView",
+  "beach access": "beachAccess",
+  "mountain view": "mountainView",
+  bbq: "bbq",
+  "ev charger": "evCharger",
+};
 
-const PRICE_UNDER =
-  /\b(?:under|below|less than|max(?:imum)?|up to|within|cheaper than|no more than)\s*\$?\s*(\d{2,4})(?:\s*(?:dollars|usd|bucks))?(?:\s*(?:a|per|\/)\s*night)?/;
-const PRICE_DOLLAR = /\$\s*(\d{2,4})(?:\s*(?:a|per|\/)\s*night)?/;
-const PRICE_WORD =
-  /\b(\d{2,4})\s*(?:dollars|usd|bucks)(?:\s*(?:a|per)\s*night)?/;
+const VIBE_WORDS = new Set([
+  "quiet",
+  "cozy",
+  "secluded",
+  "romantic",
+  "peaceful",
+  "luxury",
+  "family",
+  "lively",
+  "walkable",
+  "rustic",
+  "modern",
+  "views",
+]);
 
-const GUESTS_FOR = /\bfor\s+(\d{1,2})\b(?!\s*(?:nights?|days?|weeks?|\d))/;
-const GUESTS_NOUN =
-  /\b(\d{1,2})\s*(?:guests?|people|persons?|adults?|travell?ers?|of us)\b/;
-
-const PETS =
-  /\b(?:pet[- ]?friendly|pets?[- ]?(?:allowed|ok|welcome)|dog[- ]?friendly|dogs?|puppy|puppies|(?:with|bring)\s+(?:my|our)\s+(?:pets?|dogs?))\b/;
-
-const TYPES: [PropertyType, RegExp][] = [
-  ["cabin", /\b(?:cabins?|chalets?|lodges?)\b/],
-  ["beach", /\b(?:beach(?:es|front)?|oceanfront|seaside|coastal)\b/],
-  ["villa", /\bvillas?\b/],
-  [
-    "city",
-    /\b(?:city|cities|apartments?|lofts?|downtown|condos?|studios?|flats?)\b/,
-  ],
-];
-
-const AMENITIES: [Amenity, RegExp][] = [
-  ["hot tub", /\b(?:hot[- ]?tubs?|jacuzzi)\b/],
-  ["pool", /\b(?:swimming pool|pools?)\b/],
-  ["fireplace", /\b(?:fire[- ]?places?|wood[- ]?stove)\b/],
-  ["wifi", /\b(?:wi-?fi|internet)\b/],
-  ["kitchen", /\bkitchens?\b/],
-  ["sauna", /\bsaunas?\b/],
-  ["ocean view", /\b(?:ocean|sea)\s*views?\b/],
-  ["lake view", /\blake\s*views?\b/],
-  ["mountain view", /\bmountain\s*views?\b/],
-  ["bbq", /\b(?:bbq|barbecue|grill)\b/],
-  ["gym", /\b(?:gym|fitness)\b/],
-  ["parking", /\b(?:parking|garage)\b/],
-];
-
-const STOP = new Set(
-  "a an the with for in on at to of and or night nights per under below over stay stays place places house houses home homes near me i we us my our want looking find need get some that this is it its has have any can could would like please show give good great nice somewhere something".split(
-    " ",
-  ),
-);
-
-export function parseQuery(input: string): ParsedQuery {
-  let rest = ` ${input.toLowerCase()} `;
-  const take = (re: RegExp): RegExpMatchArray | null => {
-    const m = rest.match(re);
-    if (m) rest = rest.replace(re, " ");
-    return m;
+export function parseSearchQuery(queryText: string): ParsedQuery {
+  const text = queryText.toLowerCase();
+  const parsed: ParsedQuery = {
+    amenities: [],
+    vibes: [],
+    rawText: queryText,
   };
 
-  const out: ParsedQuery = { amenities: [], terms: [] };
-
-  const price = take(PRICE_UNDER) ?? take(PRICE_DOLLAR) ?? take(PRICE_WORD);
-  if (price) out.maxPrice = Number(price[1]);
-
-  const guests = take(GUESTS_FOR) ?? take(GUESTS_NOUN);
-  if (guests) {
-    const n = Number(guests[1]);
-    if (n >= 1 && n <= 20) out.guests = n;
+  // Price parsing: "under $300" or "< 300"
+  const priceMatch = text.match(/(?:under|\<)\s*\$?(\d+)/);
+  if (priceMatch) {
+    parsed.maxPrice = parseInt(priceMatch[1], 10);
   }
 
-  if (take(PETS)) out.pets = true;
-
-  // Amenities first, so "ocean view" never turns into a beach filter.
-  for (const [name, re] of AMENITIES) if (take(re)) out.amenities.push(name);
-
-  // The type word that appears first wins.
-  let best: { type: PropertyType; index: number } | null = null;
-  for (const [type, re] of TYPES) {
-    const idx = rest.search(re);
-    if (idx !== -1 && (!best || idx < best.index)) best = { type, index: idx };
-  }
-  if (best) {
-    out.type = best.type;
-    for (const [, re] of TYPES)
-      rest = rest.replace(new RegExp(re.source, "g"), " ");
+  // Guests parsing: "for 4", "4 guests"
+  const guestMatch = text.match(/(?:for\s*)?(\d+)\s*(?:guests?|people|person)/);
+  if (guestMatch) {
+    parsed.guests = parseInt(guestMatch[1], 10);
   }
 
-  out.terms = rest
-    .split(/[^a-z]+/)
-    .filter((w) => w.length >= 3 && !STOP.has(w));
+  // Pets parsing
+  if (
+    text.includes("pet friendly") ||
+    text.includes("pets allowed") ||
+    text.includes("dogs allowed")
+  ) {
+    parsed.pets = true;
+  }
 
-  return out;
+  // Type parsing
+  const types: PropertyType[] = [
+    "cabin",
+    "beach",
+    "city",
+    "villa",
+    "house",
+    "apartment",
+  ];
+  for (const t of types) {
+    if (text.includes(t)) {
+      parsed.type = t;
+      break;
+    }
+  }
+
+  // Amenity parsing
+  for (const [kw, amenity] of Object.entries(AMENITY_KEYWORDS)) {
+    if (text.includes(kw)) {
+      if (!parsed.amenities.includes(amenity)) {
+        parsed.amenities.push(amenity);
+      }
+    }
+  }
+
+  // Place parsing ("in/near X" or state/country match)
+  const placeMatch = text.match(
+    /(?:in|near)\s+([a-zA-Z\s]+?)(?=\s+(?:under|for|with|\$)|$)/,
+  );
+  if (placeMatch) {
+    const placeName = placeMatch[1].trim();
+    parsed.place = placeName;
+    if (US_STATES[placeName]) {
+      parsed.placeAlt = US_STATES[placeName];
+    }
+  } else {
+    // Check direct state/country matches
+    for (const [stateName, code] of Object.entries(US_STATES)) {
+      if (text.includes(stateName)) {
+        parsed.place = stateName;
+        parsed.placeAlt = code;
+        break;
+      }
+    }
+  }
+
+  // Vibe extraction
+  const words = text.replace(/[^\w\s]/g, "").split(/\s+/);
+  for (const word of words) {
+    if (VIBE_WORDS.has(word) && !parsed.vibes.includes(word)) {
+      parsed.vibes.push(word);
+    }
+  }
+
+  return parsed;
 }
