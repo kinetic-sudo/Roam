@@ -1,4 +1,3 @@
-// src/app/(app)/search.tsx
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
@@ -12,14 +11,16 @@ import { SearchField } from "@/components/stays/search-feilds";
 import { SortControl } from "@/components/stays/sort-control";
 import { Button, Icon, PressableScale, Text } from "@/components/ui";
 import { tapImpact } from "@/lib/haptics";
-import { parseSearchQuery } from "@/lib/search/parse";
-import { describeQuery, queryChips, useSanitySearch, type SortKey } from "@/lib/search/search";
+import { parseQuery } from "@/lib/search/parse";
+import { describeQuery, queryChips, searchProperties, sortProperties, type SortKey } from "@/lib/search/search";
 import { easeInOut, easeOut, stagger } from "@/theme";
 
+// One builder per row index, at module scope. Index is capped so a long list doesn't wait seconds.
 const MAX_STAGGER_INDEX = 6;
 const ROW_IN = Array.from({ length: MAX_STAGGER_INDEX + 1 }, (_, i) =>
   FadeInDown.duration(250).easing(easeOut).delay(i * stagger).reduceMotion(ReduceMotion.System),
 );
+// When the sort order changes, rows glide to their new place.
 const ROW_REFLOW = LinearTransition.duration(250).easing(easeInOut).reduceMotion(ReduceMotion.System);
 
 export default function Search() {
@@ -31,10 +32,12 @@ export default function Search() {
   const [sort, setSort] = useState<SortKey>("best");
   const inputRef = useRef<TextInput>(null);
 
+  // Home (or a deep link) can change `q` while this tab is already mounted.
   useEffect(() => {
     setText(query);
   }, [query]);
 
+  // Opened without a query: put the cursor in the field.
   useFocusEffect(
     useCallback(() => {
       if (query) return;
@@ -43,8 +46,8 @@ export default function Search() {
     }, [query]),
   );
 
-  const parsed = useMemo(() => parseSearchQuery(query), [query]);
-  const { stays: results, total, loading } = useSanitySearch(parsed, sort);
+  const parsed = useMemo(() => parseQuery(query), [query]);
+  const results = useMemo(() => sortProperties(searchProperties(parsed), sort), [parsed, sort]);
   const chips = useMemo(() => queryChips(parsed), [parsed]);
 
   const submit = (value: string) => {
@@ -84,19 +87,17 @@ export default function Search() {
 
       {results.length > 0 ? (
         <>
-          <SortControl count={total} value={sort} onChange={setSort} />
+          <SortControl count={results.length} value={sort} onChange={setSort} />
           <View className="mt-5 gap-5">
             {results.map((p, i) => (
-              <Animated.View key={`${query}|${p._id}`} entering={ROW_IN[Math.min(i, MAX_STAGGER_INDEX)]} layout={ROW_REFLOW}>
+              // Keyed by query: every new search remounts the rows, so the stagger replays.
+              // Re-sorting keeps the keys, so the rows move instead.
+              <Animated.View key={`${query}|${p.id}`} entering={ROW_IN[Math.min(i, MAX_STAGGER_INDEX)]} layout={ROW_REFLOW}>
                 <PropertyCard property={p} />
               </Animated.View>
             ))}
           </View>
         </>
-      ) : loading ? (
-        <View className="mt-16 items-center gap-3 px-4">
-          <Text tone="muted">Searching stays...</Text>
-        </View>
       ) : (
         <View className="mt-16 items-center gap-3 px-4">
           <Icon name={stayIcons.search} size={36} />
