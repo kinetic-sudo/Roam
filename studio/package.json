@@ -18,6 +18,7 @@
     "sanity"
   ],
   "dependencies": {
+    "@expo/vector-icons": "^15.1.1",
     "@sanity/client": "^8.14.1",
     "@sanity/vision": "^6.21.0",
     "react": "^19.2.4",

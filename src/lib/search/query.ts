@@ -1,4 +1,5 @@
 // src/lib/search/query.ts
+import type { IconName } from "@/components/ui";
 import { Amenity, Stay } from "../stays";
 import { ParsedQuery } from "./parse";
 
@@ -193,8 +194,8 @@ export function toggleChip(
 export function matchTags(
   stay: Stay,
   parsed: ParsedQuery,
-): Array<{ label: string; icon: string }> {
-  const tags: Array<{ label: string; icon: string }> = [];
+): Array<{ label: string; icon: IconName }> {
+  const tags: Array<{ label: string; icon: IconName }> = [];
   const priorityAmenities: Amenity[] = [
     "hotTub",
     "pool",
@@ -218,7 +219,10 @@ export function matchTags(
   }
 
   if (stay.houseRules.petsAllowed && (parsed.pets || tags.length < 2)) {
-    tags.push({ label: "Pet Friendly", icon: "paw" });
+    tags.push({
+      label: "Pet Friendly",
+      icon: { ios: "pawprint", android: "pets", web: "pets" },
+    });
     if (tags.length >= 2) return tags;
   }
 
@@ -235,26 +239,33 @@ export function matchTags(
   return tags;
 }
 
-function amenityIcon(am: Amenity): string {
+function amenityIcon(am: Amenity): IconName {
   switch (am) {
     case "hotTub":
-      return "bubbles";
+      return { ios: "bathtub", android: "hot_tub", web: "hot_tub" };
     case "pool":
-      return "pool";
+      return { ios: "figure.pool.swim", android: "pool", web: "pool" };
     case "fireplace":
-      return "fireplace";
     case "firePit":
-      return "flame";
+      return { ios: "flame", android: "fireplace", web: "fireplace" };
     case "sauna":
-      return "thermometer";
+      return { ios: "thermometer.sun", android: "sauna", web: "sauna" };
     case "oceanView":
     case "lakeView":
-      return "water";
+      return { ios: "water.waves", android: "waves", web: "waves" };
     case "mountainView":
-      return "mountain";
+      return { ios: "mountain.2", android: "landscape", web: "landscape" };
     case "beachAccess":
-      return "umbrella";
+      return { ios: "beach.umbrella", android: "beach_access", web: "beach_access" };
+    case "wifi":
+      return { ios: "wifi", android: "wifi", web: "wifi" };
+    case "kitchen":
+      return { ios: "fork.knife", android: "kitchen", web: "kitchen" };
+    case "workspace":
+      return { ios: "laptopcomputer", android: "laptop", web: "laptop" };
+    case "ac":
+      return { ios: "air.conditioner.horizontal", android: "ac_unit", web: "ac_unit" };
     default:
-      return "checkmark";
+      return { ios: "checkmark", android: "check", web: "check" };
   }
 }
