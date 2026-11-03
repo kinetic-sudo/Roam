@@ -1,8 +1,14 @@
 // Offline checks for the parser, chips and card tags (no network, no Sanity).
 // Run from the app root: npx tsx scripts/check-search.ts
 import assert from 'node:assert/strict'
-import { knownPlaces, parseSearchQuery } from '../src/lib/search/parse'
-import { buildSearchQuery, chipsFor, isChipOn, matchTags, toggleChip } from '../src/lib/search/query'
+import { knownPlaces, parseSearchQuery } from '../../src/lib/search/parse'
+import {
+    buildSearchQuery,
+    chipsFor,
+    isChipOn,
+    matchTags,
+    toggleChip,
+} from '../../src/lib/search/query'
 
 const places = knownPlaces([
   {city: 'Lisbon', country: 'Portugal'},
