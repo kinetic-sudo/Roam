@@ -6,7 +6,7 @@ import { StarIcon } from "@/components/stays/star-icon";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { useFavorite } from "@/lib/favorites";
 import { tapSelection } from "@/lib/haptics";
-import { imageUrl } from "@/lib/sanity";
+import { imageUrl } from "@/lib/sanity-cdn";
 import type { ParsedQuery } from "@/lib/search/parse";
 import { matchTags } from "@/lib/search/query";
 import { placeLabel, type Stay } from "@/lib/stays";

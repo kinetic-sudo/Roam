@@ -5,7 +5,7 @@ import { styled } from "react-native-css";
 import { Icon, Text } from "@/components/ui";
 import type { Property } from "@/data/properties";
 
-import { stayIcons } from "./icons";
+import { stayIcons } from "../search/icons";
 import { PinIcon } from "./pin-icon";
 
 const StyledImage = styled(Image, { className: "style" });
