@@ -1,9 +1,9 @@
 // Runs the spec's verification queries against your LIVE Sanity dataset through the real parser and builder.
 // Run from the app root: npx tsx scripts/verify-search.ts
 // Expected counts below are for the 30 stays seeded by studio/scripts/seed.ts.
-import { sanityQuery } from '../src/lib/sanity-cdn'
-import { knownPlaces, parseSearchQuery } from '../src/lib/search/parse'
-import { buildSearchQuery, PLACES_QUERY, type SortOption } from '../src/lib/search/query'
+import { sanityQuery } from '../../src/lib/sanity'
+import { knownPlaces, parseSearchQuery } from '../../src/lib/search/parse'
+import { buildSearchQuery, PLACES_QUERY, type SortOption } from '../../src/lib/search/query'
 
 type Row = {
   title: string
