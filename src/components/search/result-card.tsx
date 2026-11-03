@@ -2,11 +2,11 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 import { styled } from "react-native-css";
 
-import { StarIcon } from "@/components/stays/star-icon";
+import { StarIcon } from "@/components/stays/star-icons";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { useFavorite } from "@/lib/favorites";
 import { tapSelection } from "@/lib/haptics";
-import { imageUrl } from "@/lib/sanity-cdn";
+import { imageUrl } from "@/lib/sanity";
 import type { ParsedQuery } from "@/lib/search/parse";
 import { matchTags } from "@/lib/search/query";
 import { placeLabel, type Stay } from "@/lib/stays";
