@@ -7,7 +7,7 @@ import { searchIcons } from "@/components/search/icons";
 import { ResultCard, ResultCardSkeleton } from "@/components/search/result-card";
 import { SearchBar } from "@/components/search/search-bar";
 import { SearchChips } from "@/components/search/search-chips";
-import { SortMenu } from "@/components/search/sort-menu";
+import { SortMenu } from "@/components/search/search-sort";
 import { Button, Icon, PressableScale, Text } from "@/components/ui";
 import { usePlaces, useSearchStays } from "@/hooks/use-search-stays";
 import { tapImpact } from "@/lib/haptics";

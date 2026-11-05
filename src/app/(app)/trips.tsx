@@ -1,6 +1,6 @@
 import { ScrollView } from "react-native";
 
-import { stayIcons } from "@/components/stays/icons";
+import { stayIcons } from "@/components/search/icons";
 import { Icon, Text } from "@/components/ui";
 
 // Placeholder until trips exist.

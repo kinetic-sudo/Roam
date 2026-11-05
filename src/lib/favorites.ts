@@ -1,27 +1,34 @@
 // src/lib/favorites.ts
 import { useSyncExternalStore } from "react";
 
-const favorites = new Set<string>();
+// Saved stays for this session only. Not persisted: reopening the app clears them.
+let saved: ReadonlySet<string> = new Set();
 const listeners = new Set<() => void>();
+const subscribe = (l: () => void) => {
+  listeners.add(l);
+  return () => {
+    listeners.delete(l);
+  };
+};
 
 export function toggleFavorite(id: string) {
-  if (favorites.has(id)) {
-    favorites.delete(id);
-  } else {
-    favorites.add(id);
-  }
+  const next = new Set(saved);
+  if (next.has(id)) next.delete(id);
+  else next.add(id);
+  saved = next;
   listeners.forEach((l) => l());
 }
 
-export function useFavorite(id: string) {
-  const isFav = useSyncExternalStore(
-    (listener) => {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    () => favorites.has(id),
-    () => favorites.has(id),
+export function useIsFavorite(id: string): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => saved.has(id),
+    () => false,
   );
+}
 
-  return [isFav, () => toggleFavorite(id)] as const;
+/** [isSaved, toggle] for one stay. */
+export function useFavorite(id: string): [boolean, () => void] {
+  const isSaved = useIsFavorite(id);
+  return [isSaved, () => toggleFavorite(id)];
 }
