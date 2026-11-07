@@ -3,7 +3,7 @@ import { TextInput, View } from "react-native";
 
 import { Icon } from "@/components/ui";
 
-import { searchIcons } from "./search-icons";
+import { searchIcons } from "./icons";
 
 type Props = {
   value: string;
