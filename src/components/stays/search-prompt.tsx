@@ -3,7 +3,7 @@ import { TextInput, View } from "react-native";
 
 import { Icon, PressableScale } from "@/components/ui";
 
-import { stayIcons } from "../search/icons";
+import { stayIcons } from "./icon";
 
 export const SUGGESTION = "quiet pet friendly cabin with hot tub";
 
