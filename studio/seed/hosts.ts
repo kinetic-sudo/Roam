@@ -1,4 +1,5 @@
-// 12 shared hosts. No photos on purpose: the app shows an initial instead of stock portraits posing as real people.
+// 12 shared hosts. Portraits are optional: add `photoId` (an Unsplash photo page URL, or any image URL you have
+// the right to use) to give a host one. Hosts without one show an initial in the app.
 export type SeedHost = {
   slug: string
   name: string
@@ -7,6 +8,7 @@ export type SeedHost = {
   hostingSince: string
   responseTime: 'within an hour' | 'within a few hours' | 'within a day'
   languages: string[]
+  photoId?: string
 }
 
 export const hosts: SeedHost[] = [
