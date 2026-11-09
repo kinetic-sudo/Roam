@@ -3,7 +3,7 @@ import { hosts } from '../seed/hosts'
 import { policies } from '../seed/policies'
 import { reviews } from '../seed/reviews'
 import { stays } from '../seed/stays'
-import { runSeed, type Doc, type Store } from './seed-core'
+import { resolvePhoto, runSeed, type Doc, type Store } from './seed-core'
 
 // Proves the rerun behaviour against an in-memory store, with no Sanity involved.
 // Run: npx tsx scripts/seed-core.test.ts
@@ -13,6 +13,7 @@ class MemoryStore implements Store {
   assets = new Map<string, string>()
   writes = 0
   uploads = 0
+  urls: string[] = []
   failUploads = new Set<string>()
   private n = 0
   private keyOf = (d: Doc) => (d._type === 'review' ? d.seedKey : d.slug?.current)
@@ -37,7 +38,8 @@ class MemoryStore implements Store {
   async findAsset(id: string) {
     return this.assets.get(id) ?? null
   }
-  async uploadAsset(id: string) {
+  async uploadAsset(id: string, url: string) {
+    this.urls.push(url)
     if (this.failUploads.has(id)) return null
     const _id = `image-${id}`
     this.assets.set(id, _id)
@@ -216,6 +218,105 @@ const test = async (name: string, fn: () => Promise<void>) => {
     assert.equal(r2.counts.property.created, 0)
     const r3 = await runSeed(e, {dryRun: false})
     assert.equal(sum(r3, 'updated') + sum(r3, 'created'), 0)
+  })
+
+  await test('resolvePhoto understands every way of writing a photo', async () => {
+    const page = {
+      id: 'AbCdEfGhIjK',
+      url: 'https://unsplash.com/photos/AbCdEfGhIjK/download?force=true&w=2000',
+    }
+    assert.deepEqual(
+      resolvePhoto('https://unsplash.com/photos/a-room-with-a-view-AbCdEfGhIjK'),
+      page,
+    )
+    assert.deepEqual(
+      resolvePhoto('https://unsplash.com/photos/a-room-with-a-view-AbCdEfGhIjK?utm_source=x'),
+      page,
+    )
+    assert.deepEqual(resolvePhoto('https://unsplash.com/photos/AbCdEfGhIjK'), page)
+    assert.deepEqual(resolvePhoto('AbCdEfGhIjK'), page)
+    const cdn = resolvePhoto('1510798831971-661eb04b3739')
+    assert.equal(cdn.id, '1510798831971-661eb04b3739')
+    assert.match(cdn.url, /^https:\/\/images\.unsplash\.com\/photo-1510798831971-661eb04b3739\?/)
+    assert.equal(
+      resolvePhoto('https://images.unsplash.com/photo-1510798831971-661eb04b3739?ixid=abc').id,
+      '1510798831971-661eb04b3739',
+    )
+    assert.deepEqual(resolvePhoto('https://example.com/me.jpg'), {
+      id: 'https://example.com/me.jpg',
+      url: 'https://example.com/me.jpg',
+    })
+  })
+
+  await test('a stay given an Unsplash page URL is downloaded once and a rerun is a no-op', async () => {
+    const e = new MemoryStore()
+    const stay = stays.find((x) => x.slug === 'kyoto-machiya-townhouse')!
+    stay.photoIds = ['https://unsplash.com/photos/a-room-with-tatami-AbCdEfGhIjK']
+    try {
+      const r = await runSeed(e, {dryRun: false})
+      assert.ok(
+        e.urls.includes('https://unsplash.com/photos/AbCdEfGhIjK/download?force=true&w=2000'),
+      )
+      assert.equal(e.byKey('property', 'kyoto-machiya-townhouse').photos.length, 1)
+      assert.match(
+        e.byKey('property', 'kyoto-machiya-townhouse').photos[0].alt,
+        /Kyoto Machiya Townhouse, Kyoto, Japan/,
+      )
+      assert.equal(r.missingPhotos.length, 13, 'one fewer stay is missing a photo')
+      const before = e.writes
+      const r2 = await runSeed(e, {dryRun: false})
+      assert.equal(e.writes, before)
+      assert.equal(sum(r2, 'updated') + sum(r2, 'created'), 0)
+    } finally {
+      stay.photoIds = []
+    }
+  })
+
+  await test('adding a photo to an already-seeded stay updates only that stay', async () => {
+    const e = new MemoryStore()
+    await runSeed(e, {dryRun: false})
+    const stay = stays.find((x) => x.slug === 'alfama-tile-front-apartment')!
+    stay.photoIds = ['https://unsplash.com/photos/tiled-facade-QwErTyUiOpA']
+    try {
+      const r = await runSeed(e, {dryRun: false})
+      assert.equal(r.counts.property.updated, 1)
+      assert.equal(sum(r, 'updated'), 1)
+      assert.equal(sum(r, 'created'), 0)
+      assert.match(r.updatedKeys[0], /alfama-tile-front-apartment \(photos\)/)
+    } finally {
+      stay.photoIds = []
+    }
+  })
+
+  await test("host portraits are optional, uploaded once, and a failed one doesn't block the host", async () => {
+    const e = new MemoryStore()
+    const [a, b] = hosts
+    a.photoId = 'https://unsplash.com/photos/portrait-ZyXwVuTsRqP'
+    b.photoId = 'https://unsplash.com/photos/portrait-LkJhGfDsAzX'
+    e.failUploads.add('LkJhGfDsAzX')
+    try {
+      const r = await runSeed(e, {dryRun: false})
+      assert.ok(e.byKey('host', a.slug).photo?.asset?._ref, 'first host has a portrait')
+      assert.equal(
+        e.byKey('host', b.slug).photo,
+        undefined,
+        'failed upload: host seeded without a portrait',
+      )
+      assert.ok(r.assets.failed.length === 1 && /LkJhGfDsAzX/.test(r.assets.failed[0]))
+      assert.equal(
+        e.byKey('host', hosts[2].slug).photo,
+        undefined,
+        'other hosts stay portrait-free',
+      )
+      e.failUploads.clear()
+      const r2 = await runSeed(e, {dryRun: false})
+      assert.equal(r2.counts.host.updated, 1, 'the retried host gets its portrait')
+      const r3 = await runSeed(e, {dryRun: false})
+      assert.equal(sum(r3, 'updated') + sum(r3, 'created'), 0)
+    } finally {
+      delete a.photoId
+      delete b.photoId
+    }
   })
 
   await test('slugs and keys are stable ids: no duplicated content after 5 runs', async () => {
