@@ -4,7 +4,9 @@
 // Typed fields drive every guest filter. `facts` and `vibes` are the source of the descriptive copy
 // (summary, description, highlights), which is checked against them by scripts/copy-checks.ts.
 // Photos: the 16 original stays reuse the Unsplash photos already in the app. The 14 new stays have
-// no photo source yet (photoIds: []) and are listed as "missing photos" by the seed until you add ids.
+// no photo yet (photoIds: []) and are listed as "missing photos" by the seed. To add one, paste the Unsplash
+// photo page URL (from the address bar) into photoIds, e.g. ["https://unsplash.com/photos/...-AbCdEfGhIjK"],
+// then run the seed again: only that stay changes. Use free photos only (no "Unsplash+" lock icon).
 
 export type Amenity =
   | 'hotTub'
