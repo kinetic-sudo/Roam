@@ -35,6 +35,24 @@ export type Report = {
 export const photoUrl = (id: string) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=2000&q=80`
 
+/**
+ * A photo can be written as any of: an Unsplash photo page URL (copy it from the address bar), an
+ * images.unsplash.com URL, the 11-character id at the end of a photo page URL, the long CDN id
+ * ("1510798831971-661eb04b3739"), or any other https image URL. Returns the id used to recognise the
+ * asset on later runs, and the URL to download from.
+ */
+export function resolvePhoto(entry: string): {id: string; url: string} {
+  const e = entry.trim()
+  const page = e.match(/unsplash\.com\/photos\/(?:[^/?#]*-)?([A-Za-z0-9_-]{11})(?:[/?#]|$)/)
+  if (page) return {id: page[1], url: pageDownload(page[1])}
+  const cdn = e.match(/images\.unsplash\.com\/(?:premium_)?photo-([A-Za-z0-9_-]+)/)
+  if (cdn) return {id: cdn[1], url: photoUrl(cdn[1])}
+  if (/^https?:\/\//.test(e)) return {id: e, url: e}
+  if (/^[A-Za-z0-9_-]{11}$/.test(e)) return {id: e, url: pageDownload(e)}
+  return {id: e, url: photoUrl(e)}
+}
+const pageDownload = (id: string) => `https://unsplash.com/photos/${id}/download?force=true&w=2000`
+
 // ---------- comparison ----------
 function norm(v: unknown): unknown {
   if (Array.isArray(v)) return v.map(norm)
@@ -91,6 +109,29 @@ export async function runSeed(store: Store, opts: {dryRun: boolean}): Promise<Re
     return existing._id
   }
 
+  // Photos are uploaded once and recognised on later runs by their source id.
+  const assetCache = new Map<string, string | null>()
+  async function resolveAsset(entry: string): Promise<string | null> {
+    const {id: sourceId, url} = resolvePhoto(entry)
+    if (assetCache.has(sourceId)) return assetCache.get(sourceId)!
+    let id = await store.findAsset(sourceId)
+    if (id) report.assets.reused++
+    else if (dryRun) {
+      id = `dry-asset:${sourceId}`
+      report.assets.uploaded++ // "would upload"
+    } else {
+      id = await store.uploadAsset(
+        sourceId,
+        url,
+        `${sourceId.replace(/[^\w-]/g, '_').slice(0, 60)}.jpg`,
+      )
+      if (id) report.assets.uploaded++
+      else report.assets.failed.push(entry)
+    }
+    assetCache.set(sourceId, id)
+    return id
+  }
+
   // 1. policies, 2. hosts (referenced by stays)
   const policyId = new Map<string, string>()
   for (const p of policies) {
@@ -107,38 +148,28 @@ export async function runSeed(store: Store, opts: {dryRun: boolean}): Promise<Re
   }
   const hostId = new Map<string, string>()
   for (const h of hosts) {
+    const portrait = h.photoId ? await resolveAsset(h.photoId) : null
     hostId.set(
       h.slug,
-      await upsert('host', h.slug, {
-        name: h.name,
-        slug: {_type: 'slug', current: h.slug},
-        bio: h.bio,
-        isSuperhost: h.isSuperhost,
-        hostingSince: h.hostingSince,
-        responseTime: h.responseTime,
-        languages: h.languages,
-      }),
+      await upsert(
+        'host',
+        h.slug,
+        clean({
+          name: h.name,
+          slug: {_type: 'slug', current: h.slug},
+          // Optional: hosts without a portrait show an initial in the app.
+          photo: portrait ? {_type: 'image', asset: ref(portrait)} : undefined,
+          bio: h.bio,
+          isSuperhost: h.isSuperhost,
+          hostingSince: h.hostingSince,
+          responseTime: h.responseTime,
+          languages: h.languages,
+        }),
+      ),
     )
   }
 
-  // 3. photos, then stays
-  const assetCache = new Map<string, string | null>()
-  async function resolveAsset(photoId: string): Promise<string | null> {
-    if (assetCache.has(photoId)) return assetCache.get(photoId)!
-    let id = await store.findAsset(photoId)
-    if (id) report.assets.reused++
-    else if (dryRun) {
-      id = `dry-asset:${photoId}`
-      report.assets.uploaded++ // "would upload"
-    } else {
-      id = await store.uploadAsset(photoId, photoUrl(photoId), `${photoId}.jpg`)
-      if (id) report.assets.uploaded++
-      else report.assets.failed.push(photoId)
-    }
-    assetCache.set(photoId, id)
-    return id
-  }
-
+  // 3. stays
   const propertyId = new Map<string, string>()
   for (const s of stays) {
     const photos: unknown[] = []
