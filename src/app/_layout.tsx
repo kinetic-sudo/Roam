@@ -46,6 +46,21 @@ function Routes() {
       {/* Signed-in only. Deep links here while signed out fall back to index. */}
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="(app)" />
+        {/* Pushed over the tabs, so the tab bar is hidden. policies and host are native form sheets. */}
+        <Stack.Screen name="stay/[slug]/index" />
+        <Stack.Screen
+          name="stay/[slug]/policies"
+          options={{
+            presentation: "formSheet",
+            sheetGrabberVisible: true,
+            sheetAllowedDetents: [0.6, 1],
+            sheetExpandsWhenScrolledToEdge: true,
+          }}
+        />
+        <Stack.Screen
+          name="stay/[slug]/host"
+          options={{ presentation: "formSheet", sheetGrabberVisible: true, sheetAllowedDetents: [0.5, 1] }}
+        />
       </Stack.Protected>
 
       <Stack.Screen

@@ -2,6 +2,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useState, type ReactNode } from "react";
 import { ScrollView, View } from "react-native";
 
+import { PolicyCard } from "@/components/stay/policy-card";
+import { stayIcons } from "@/components/stays/icon";
 import {
   Alert,
   Badge,
@@ -339,6 +341,30 @@ export default function Index() {
             </View>
           ))}
         </View>
+      </Section>
+
+      <Section number="16" title="Stay">
+        <Text variant="footnote" tone="subtle">
+          stayTitle
+        </Text>
+        <Text variant="stayTitle">Modern Cabin with Hot Tub</Text>
+        <View className="gap-2.5">
+          <PolicyCard
+            tile
+            icon={stayIcons.chat}
+            title="Ask about policies"
+            subtitle="Cancellation, house rules, pets, check-in and more."
+            onPress={() => {}}
+          />
+          <PolicyCard
+            icon={stayIcons.policy}
+            iconSize={30}
+            title="Moderate cancellation"
+            subtitle="Free cancellation up to 5 days before check-in."
+            onPress={() => {}}
+          />
+        </View>
+        <Button title="Book this stay" size="lg" />
       </Section>
 
       <Section number="--" title="Radius & shadow">
