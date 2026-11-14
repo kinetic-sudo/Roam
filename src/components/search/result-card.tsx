@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 import { styled } from "react-native-css";
 
-import { StarIcon } from "@/components/stay/star-icons";
+import { StarIcon } from "@/components/stays/star-icons";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { useFavorite } from "@/lib/favorites";
 import { tapSelection } from "@/lib/haptics";
