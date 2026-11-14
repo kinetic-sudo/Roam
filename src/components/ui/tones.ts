@@ -10,6 +10,7 @@ export const toneClass = {
   success: "text-success",
   danger: "text-danger",
   info: "text-info",
+  bronze: "text-bronze",
 } as const;
 
 export type Tone = keyof typeof toneClass;
