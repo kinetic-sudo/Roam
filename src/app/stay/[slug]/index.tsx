@@ -16,7 +16,7 @@ import { rowIcons } from "@/components/stay/row-icons";
 import { StaySkeleton } from "@/components/stay/stay-skeleton";
 import { Button, Icon, Text } from "@/components/ui";
 import { useStay } from "@/hooks/use-stay";
-import { track } from "@/lib/";
+import { track } from "@/lib/analytics";
 import { useFavorite } from "@/lib/favorites";
 import { tapImpact, tapSelection } from "@/lib/haptics";
 import { placeLabel } from "@/lib/stays";
