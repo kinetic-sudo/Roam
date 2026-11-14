@@ -7,8 +7,8 @@ import { Icon, PressableScale, Text } from "@/components/ui";
 import { imageUrl } from "@/lib/sanity";
 import { placeLabel, type HomeStay } from "@/lib/stays";
 
+import { PinIcon } from "../stays/pin-icon";
 import { stayIcons } from "./icon";
-import { PinIcon } from "./pin-icon";
 
 const StyledImage = styled(Image, { className: "style" });
 
