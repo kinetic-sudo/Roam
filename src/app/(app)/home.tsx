@@ -5,10 +5,10 @@ import { ScrollView, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LayoutAnimationConfig, LinearTransition, ReduceMotion } from "react-native-reanimated";
 
 import { CategoryChips, type Category } from "@/components/home/category-chips";
-import { Avatar } from "@/components/stay/avatar";
 import { stayIcons } from "@/components/stay/icon";
 import { PropertyCard } from "@/components/stay/property-card";
 import { SearchPrompt, SUGGESTION } from "@/components/stay/search-prompt";
+import { Avatar } from "@/components/stays/avatar";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { properties } from "@/data/properties";
 import { tapImpact } from "@/lib/haptics";
