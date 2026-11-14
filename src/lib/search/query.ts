@@ -337,12 +337,10 @@ export function matchTags(
   for (const a of standouts.slice(1)) add(a);
   for (const a of FALLBACK) if (has(a)) add(a);
 
-  return ordered
-    .slice(0, 2)
-    .map((key) => ({
-      key,
-      label: key === "pets" ? "Pet Friendly" : AMENITY_LABEL[key],
-    }));
+  return ordered.slice(0, 2).map((key) => ({
+    key,
+    label: key === "pets" ? "Pet Friendly" : AMENITY_LABEL[key],
+  }));
 }
 
 /** Stable key for "has the query changed?" checks. */
