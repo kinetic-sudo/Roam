@@ -2,7 +2,7 @@ import { useClerk, useUser } from "@clerk/expo";
 import { useState } from "react";
 import { ScrollView, View } from "react-native";
 
-import { Avatar } from "@/components/stays/avatar";
+import { Avatar } from "@/components/stay/avatar";
 import { Button, Text } from "@/components/ui";
 import { clerkMessage } from "@/lib/auth/clerk-error";
 

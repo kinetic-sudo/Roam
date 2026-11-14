@@ -6,14 +6,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AmenityRow } from "@/components/stay/amenity-row";
 import { HostRow } from "@/components/stay/host-row";
+import { stayIcons } from "@/components/stay/icon";
 import { PhotoButton } from "@/components/stay/photo-button";
 import { PhotoGallery } from "@/components/stay/photo-gallery";
 import { PolicyCard } from "@/components/stay/policy-card";
 import { PRICE_BAR_HEIGHT, PriceBar } from "@/components/stay/price-bar";
 import { RatingBox } from "@/components/stay/rating-box";
+import { rowIcons } from "@/components/stay/row-icons";
 import { StaySkeleton } from "@/components/stay/stay-skeleton";
-import { stayIcons } from "@/components/stays/icon";
-import { rowIcons } from "@/components/stays/row-icons";
 import { Button, Icon, Text } from "@/components/ui";
 import { useStay } from "@/hooks/use-stay";
 import { track } from "@/lib/analytics";

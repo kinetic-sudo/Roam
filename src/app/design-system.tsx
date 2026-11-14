@@ -2,8 +2,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useState, type ReactNode } from "react";
 import { ScrollView, View } from "react-native";
 
+import { stayIcons } from "@/components/stay/icon";
 import { PolicyCard } from "@/components/stay/policy-card";
-import { stayIcons } from "@/components/stays/icon";
 import {
   Alert,
   Badge,
