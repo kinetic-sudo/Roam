@@ -1,8 +1,8 @@
 import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { Avatar } from "@/components/stays/avatar";
 import { SuperhostLine } from "@/components/stay/host-row";
+import { Avatar } from "@/components/stays/avatar";
 import { Text } from "@/components/ui";
 import { useStay } from "@/hooks/use-stay";
 import { hostFacts } from "@/lib/stay-details";
