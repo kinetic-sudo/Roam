@@ -34,7 +34,7 @@ export function PriceBar({
           {totalLabel(stay)}
         </Text>
       </View>
-      <Button title="Book this stay" size="lg" onPress={onBook} className="flex-1" />
+      <Button title="Book this stay" size="lg" variant="highlight" onPress={onBook} className="flex-1" />
     </View>
   );
 }
