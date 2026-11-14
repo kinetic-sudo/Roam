@@ -2,7 +2,7 @@ import { View } from "react-native";
 
 import { tagIcons } from "@/components/search/icons";
 import { Icon, Text } from "@/components/ui";
-import { EMPTY_QUERY, stayTags } from "@/lib/search/query";
+import { EMPTY_QUERY, stayTags } from "@/lib/search/queries";
 import type { StayDetails } from "@/lib/stays";
 
 /**
