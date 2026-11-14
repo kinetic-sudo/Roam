@@ -4,14 +4,14 @@ import { useEffect, useState } from "react";
 import { Alert, ScrollView, Share, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AmenityRow } from "@/components/stay/amenity-row";
+import { RatingBox } from "@/components/stay/";
+import { AmenityRow } from "@/components/stay/amenities-row";
 import { HostRow } from "@/components/stay/host-row";
 import { stayIcons } from "@/components/stay/icon";
 import { PhotoButton } from "@/components/stay/photo-button";
 import { PhotoGallery } from "@/components/stay/photo-gallery";
 import { PolicyCard } from "@/components/stay/policy-card";
 import { PRICE_BAR_HEIGHT, PriceBar } from "@/components/stay/price-bar";
-import { RatingBox } from "@/components/stay/rating-box";
 import { rowIcons } from "@/components/stay/row-icons";
 import { StaySkeleton } from "@/components/stay/stay-skeleton";
 import { Button, Icon, Text } from "@/components/ui";
