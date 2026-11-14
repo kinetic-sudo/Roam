@@ -8,9 +8,9 @@ import { CategoryChips, type Category } from "@/components/home/category-chips";
 import { SearchPrompt, SUGGESTION } from "@/components/stay/search-prompt";
 import { Avatar } from "@/components/stays/avatar";
 import { stayIcons } from "@/components/stays/icon";
-import { PropertyCard } from "@/components/stays/property-card";
-import { Icon, PressableScale, Text } from "@/components/ui";
-import { properties } from "@/data/properties";
+import { PropertyCard, PropertyCardSkeleton } from "@/components/stays/property-card";
+import { Button, Icon, PressableScale, Text } from "@/components/ui";
+import { useHomeStays } from "@/hooks/use-home-stays";
 import { tapImpact } from "@/lib/haptics";
 import { easeInOut } from "@/theme";
 
@@ -25,9 +25,10 @@ export default function Home() {
   const [category, setCategory] = useState<Category>("all");
   const [prompt, setPrompt] = useState("");
 
+  const { stays, status, retry } = useHomeStays();
   const visible = useMemo(
-    () => (category === "all" ? properties : properties.filter((p) => p.type === category)),
-    [category],
+    () => (category === "all" ? stays : stays.filter((s) => s.type === category)),
+    [stays, category],
   );
 
   const send = (q: string) => {
@@ -54,8 +55,7 @@ export default function Home() {
       </Text>
 
       <View className="mt-1 flex-row items-center gap-4">
-        {/* Needs the `jumbo` variant in text.tsx (see SETUP-HOME.md) */}
-        <Text variant="headline" className="flex-1">
+                <Text variant="headline" className="flex-1">
           {"Find your\nnext stay"}
         </Text>
         <PressableScale
@@ -76,16 +76,35 @@ export default function Home() {
         <CategoryChips value={category} onChange={setCategory} />
       </View>
 
-      {/* skipEntering: the first render shows the cards at once; only category changes animate. */}
-      <LayoutAnimationConfig skipEntering>
+      {status === "loading" ? (
         <View className="mt-7 gap-5">
-          {visible.map((p) => (
-            <Animated.View key={p.id} entering={CARD_IN} exiting={CARD_OUT} layout={CARD_REFLOW}>
-              <PropertyCard property={p} />
-            </Animated.View>
-          ))}
+          <PropertyCardSkeleton />
+          <PropertyCardSkeleton />
+          <PropertyCardSkeleton />
         </View>
-      </LayoutAnimationConfig>
+      ) : status === "error" ? (
+        <View className="mt-10 items-center gap-4">
+          <Text variant="body" tone="muted" className="text-center">
+            {"We couldn't load stays. Check your connection and try again."}
+          </Text>
+          <Button title="Try again" variant="secondary" size="sm" onPress={retry} />
+        </View>
+      ) : visible.length === 0 ? (
+        <Text variant="body" tone="muted" className="mt-10 text-center">
+          No stays here yet.
+        </Text>
+      ) : (
+        // skipEntering: the first render shows the cards at once; only category changes animate.
+        <LayoutAnimationConfig skipEntering>
+          <View className="mt-7 gap-5">
+            {visible.map((s) => (
+              <Animated.View key={s._id} entering={CARD_IN} exiting={CARD_OUT} layout={CARD_REFLOW}>
+                <PropertyCard stay={s} />
+              </Animated.View>
+            ))}
+          </View>
+        </LayoutAnimationConfig>
+      )}
     </ScrollView>
   );
 }
