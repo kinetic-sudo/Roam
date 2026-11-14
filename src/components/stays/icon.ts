@@ -23,6 +23,11 @@ export const stayIcons = {
     android: "chevron_left",
     web: "chevron_left",
   },
+  // Stay details. Check each SF name draws in the simulator; substitute and mark any that do not.
+  share: { ios: "square.and.arrow.up", android: "share", web: "share" },
+  chat: { ios: "bubble.left", android: "chat_bubble_outline", web: "chat_bubble_outline" },
+  policy: { ios: "doc.text", android: "description", web: "description" },
+  rosette: { ios: "rosette", android: "workspace_premium", web: "workspace_premium" },
   // Chip glyphs (filled where SF has them).
   homeFill: { ios: "house.fill", android: "home", web: "home" },
   cabin: { ios: "tree.fill", android: "cabin", web: "cabin" },

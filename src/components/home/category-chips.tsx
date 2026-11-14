@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { stayIcons } from "@/components/stays/icon";
+import { stayIcons } from "@/components/stay/icon";
 import { Icon, PressableScale, Text, type IconName } from "@/components/ui";
 import type { PropertyType } from "@/data/properties";
 import { cn } from "@/lib/cn";

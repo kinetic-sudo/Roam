@@ -1,7 +1,7 @@
 import { View } from "react-native";
 
-import { Avatar } from "@/components/stays/avatar";
-import { stayIcons } from "@/components/stays/icon";
+import { Avatar } from "@/components/stay/avatar";
+import { stayIcons } from "@/components/stay/icon";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { firstName } from "@/lib/stay-details";

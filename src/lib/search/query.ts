@@ -313,14 +313,19 @@ const PRIORITY: Amenity[] = [
 ];
 const FALLBACK: Amenity[] = ["workspace", "wifi", "kitchen", "ac"];
 
+/** A query with nothing set: `stayTags` with this asks "what is this stay known for?". */
+export const EMPTY_QUERY: ParsedQuery = { amenities: [], vibes: [], rawText: "" };
+
 /**
- * Up to two tags for a result card: what the guest asked for first (matched amenities, then pets), then the
- * stay's first standout amenity, Pet Friendly if allowed, the next amenity, and finally everyday ones.
+ * Up to `max` tags: what the guest asked for first (matched amenities, then pets), then the stay's first
+ * standout amenity, Pet Friendly if allowed, the next amenities, and finally everyday ones.
  * "Hot Tub + Pet Friendly" for the spec's example query; "Pool + Ocean View" for a pool villa with no pets.
+ * With an empty query and `max` 4, Lake Arrowhead gives Hot Tub, Pet Friendly, Fireplace, Fire Pit.
  */
-export function matchTags(
+export function stayTags(
   stay: Pick<Stay, "amenities" | "houseRules">,
   parsed: ParsedQuery,
+  max: number,
 ): { key: TagKey; label: string }[] {
   const has = (a: Amenity) => stay.amenities.includes(a);
   const petsOk = !!stay.houseRules?.petsAllowed;
@@ -338,12 +343,18 @@ export function matchTags(
   for (const a of FALLBACK) if (has(a)) add(a);
 
   return ordered
-    .slice(0, 2)
+    .slice(0, max)
     .map((key) => ({
       key,
       label: key === "pets" ? "Pet Friendly" : AMENITY_LABEL[key],
     }));
 }
+
+/** The two tags on a Search result card. */
+export const matchTags = (
+  stay: Pick<Stay, "amenities" | "houseRules">,
+  parsed: ParsedQuery,
+) => stayTags(stay, parsed, 2);
 
 /** Stable key for "has the query changed?" checks. */
 export const searchKey = (parsed: ParsedQuery, sort: SortOption) =>
