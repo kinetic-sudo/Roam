@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { StarIcon } from "@/components/stays/";
+import { StarIcon } from "@/components/stays/star-icons";
 import { Text } from "@/components/ui";
 
 /** Star + rating over the review count, in a soft grey box. */
