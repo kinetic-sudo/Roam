@@ -1,11 +1,32 @@
 {
   "stays": {
     "a-frame-in-the-catskills": ["gmQr2-qWkYQ", "AZDyU1hXtCE"],
-    "tiny-cabin-in-the-smokies": ["8ZmwIbjOa9o", "K1iqi58F4Qw"],
     "tahoe-lodge-with-sauna-and-hot-tub": ["a3b60eSxTm4", "NP0NK2LOE6E"],
+    "tiny-cabin-in-the-smokies": ["8ZmwIbjOa9o", "K1iqi58F4Qw"],
+    "kihei-beachfront-condo": ["DuD5D3lWC3c", "CcETP4gFBTU"],
+    "tamarindo-casita-with-pool": ["a3ly0RqbZdw", "_DhwDMZVWVo"],
+    "byron-bay-garden-bungalow": ["Sph6nX1x2Xc", "dBbcv_u8_pA"],
+    "harbour-view-cottage": ["EZcf-gS0ax8", "YzcxhN54-60"],
     "alfama-tile-front-apartment": ["y3cxr6ey_TM", "ues64WS-xw0"],
+    "condesa-studio-under-the-trees": ["_0Snq5MbjjA", "spFG69q1cRM"],
     "kyoto-machiya-townhouse": ["VCGQyqqsGGI", "Dmko4LCIuFs"],
-    "kihei-beachfront-condo": ["DuD5D3lWC3c", "CcETP4gFBTU"]
+    "eastside-loft-with-private-hot-tub": ["lbVDC9vH-Wg"],
+    "seminyak-garden-villa": ["6LnfvLChELE", "VoHbPTldlsI"],
+    "deia-hillside-villa": ["NjM3CSRWBcs", "Tqu5Spkyn24"],
+    "lake-como-garden-villa": ["TED51AB4D4k", "EEyAFnAPT0E"]
   },
-  "hosts": {}
+  "hosts": {
+    "maya-chen": "PmLxiS1uhbA",
+    "daniel-okafor": "qa9YCT-490I",
+    "sofia-rinaldi": "xGW1BW5Xfhg",
+    "liam-hargrove": "pp76Y6Fq6xw",
+    "priya-nair": "j9BvvXbmBeE",
+    "mateo-alvarez": "Vaj8Yo4bs38",
+    "hannah-lindqvist": "LlcpQWSWPUo",
+    "kenji-watanabe": "Eo5CDaYgVgo",
+    "amara-osei": "M_y36MbKxzc",
+    "tom-and-ellie-brooks": "j7buSw0VUVk",
+    "isabela-santos": "vnppvekjH6o",
+    "jonas-berg": "crcEjrTYyEE"
+  }
 }
