@@ -7,10 +7,13 @@ import { Text } from "./text";
 
 const variants = {
   primary: { container: "bg-primary", text: "button" },
+  // Orange call to action (Book this stay).
+  highlight: { container: "bg-orange", text: "button" },
   secondary: { container: "border border-border bg-surface", text: "buttonSecondary" },
 } as const;
 
 const sizes = {
+  lg: "h-16 px-5",
   md: "h-14 px-6",
   sm: "h-10 px-4",
 } as const;

@@ -1,7 +1,10 @@
 import type { SanityClient } from '@sanity/client'
 import { getCliClient } from 'sanity/cli'
 
-import { formatReport, runSeed, type Doc, type Store } from './seed-core'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import { formatReport, runSeed, type Doc, type PhotoPicks, type Store } from './seed-core'
 
 // Seeds Roam's content: 8 policies, 12 hosts, 30 stays, 90 reviews. Safe to run more than once.
 //
@@ -45,13 +48,25 @@ function sanityStore(client: SanityClient): Store {
   }
 }
 
+// seed/photo-picks.json is written by `npm run photos`. Missing or unreadable: the seed runs without it.
+function loadPicks(): PhotoPicks {
+  const file = join(process.cwd(), 'seed', 'photo-picks.json')
+  if (!existsSync(file)) return {}
+  try {
+    return JSON.parse(readFileSync(file, 'utf8')) as PhotoPicks
+  } catch {
+    console.warn('seed/photo-picks.json is not valid JSON; ignoring it.\n')
+    return {}
+  }
+}
+
 async function main() {
   const dryRun = process.argv.includes('--dry-run')
   const client = getCliClient({apiVersion: '2026-10-08'}).withConfig({useCdn: false})
   const {projectId, dataset} = client.config()
   console.log(`${dryRun ? 'Dry run against' : 'Seeding'} ${projectId} / ${dataset}\n`)
 
-  const report = await runSeed(sanityStore(client), {dryRun})
+  const report = await runSeed(sanityStore(client), {dryRun, picks: loadPicks()})
   console.log(formatReport(report))
 }
 

@@ -12,7 +12,7 @@ export function RatingBox({ rating, reviewCount }: { rating: number; reviewCount
       className="items-center rounded-lg bg-surface-muted px-4 py-2.5"
     >
       <View className="flex-row items-center gap-1">
-        <StarIcon size={20} />
+        <StarIcon size={20} className="text-orange" />
         <Text variant="title">{rating.toFixed(1)}</Text>
       </View>
       <Text variant="lead" tone="subtle">

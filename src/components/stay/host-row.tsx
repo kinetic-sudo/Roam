@@ -34,7 +34,7 @@ export function HostRow({ host, onPress }: { host: StayHost; onPress: () => void
 export function SuperhostLine({ className }: { className?: string }) {
   return (
     <View className={cn("flex-row items-center gap-1.5", className)}>
-      <Icon name={stayIcons.rosette} size={16} tone="subtle" />
+      <Icon name={stayIcons.rosette} size={18} tone="bronze" />
       <Text variant="label" tone="subtle">
         Superhost
       </Text>

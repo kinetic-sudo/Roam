@@ -5,6 +5,7 @@ import { Icon, Text } from "@/components/ui";
 import { EMPTY_QUERY, stayTags } from "@/lib/search/query";
 import type { StayDetails } from "@/lib/stays";
 
+
 /**
  * Four amenity highlights (the same tags and glyphs as Search), then the divider under them.
  * Fewer than four stay left-aligned at a quarter width each. With none, the row and its divider are hidden.

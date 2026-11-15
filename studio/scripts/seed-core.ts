@@ -74,8 +74,18 @@ const clean = <T extends Record<string, unknown>>(o: T): T =>
 const placeOf = (s: {city: string; region?: string; country: string}) =>
   `${s.city}, ${s.region ?? s.country}`
 
-export async function runSeed(store: Store, opts: {dryRun: boolean}): Promise<Report> {
+/**
+ * Photos chosen by `npm run photos` (seed/photo-picks.json), added on top of the seed files: a stay whose
+ * `photoIds` is empty takes `stays[slug]`, a host without a `photoId` takes `hosts[slug]`. Seed-file photos win.
+ */
+export type PhotoPicks = {stays?: Record<string, string[]>; hosts?: Record<string, string>}
+
+export async function runSeed(
+  store: Store,
+  opts: {dryRun: boolean; picks?: PhotoPicks},
+): Promise<Report> {
   const {dryRun} = opts
+  const picks = opts.picks ?? {}
   const report: Report = {
     dryRun,
     counts: {policy: blank(), host: blank(), property: blank(), review: blank()},
@@ -148,7 +158,8 @@ export async function runSeed(store: Store, opts: {dryRun: boolean}): Promise<Re
   }
   const hostId = new Map<string, string>()
   for (const h of hosts) {
-    const portrait = h.photoId ? await resolveAsset(h.photoId) : null
+    const portraitSrc = h.photoId ?? picks.hosts?.[h.slug]
+    const portrait = portraitSrc ? await resolveAsset(portraitSrc) : null
     hostId.set(
       h.slug,
       await upsert(
@@ -173,9 +184,10 @@ export async function runSeed(store: Store, opts: {dryRun: boolean}): Promise<Re
   const propertyId = new Map<string, string>()
   for (const s of stays) {
     const photos: unknown[] = []
-    if (s.photoIds.length === 0)
+    const photoIds = s.photoIds.length > 0 ? s.photoIds : (picks.stays?.[s.slug] ?? [])
+    if (photoIds.length === 0)
       report.missingPhotos.push({slug: s.slug, reason: 'no photo source yet (photoIds is empty)'})
-    for (const [i, pid] of s.photoIds.entries()) {
+    for (const [i, pid] of photoIds.entries()) {
       const asset = await resolveAsset(pid)
       if (!asset) {
         report.missingPhotos.push({slug: s.slug, reason: `upload failed for ${pid}`})

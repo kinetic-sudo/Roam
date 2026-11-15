@@ -10,6 +10,8 @@
   --color-*: initial;
   --color-primary: #ffc629;
   --color-primary-soft: #fef6dc; /* * */
+  --color-orange: #ffa90a; /* * stay details: star and Book this stay */
+  --color-bronze: #a9735c; /* * Superhost rosette */
   --color-lavender: #c9b4ff;
   --color-lavender-soft: #f3f0ff; /* * */
   --color-lavender-muted: #e6dfff; /* * icon tile on lavender cards */
