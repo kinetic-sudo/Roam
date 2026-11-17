@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View, type LayoutChangeEvent } from "react-native";
 
 import { PolicyBody } from "@/components/stay/policy-body";
 import { Text } from "@/components/ui";
@@ -9,7 +9,8 @@ import { houseRuleLines, sortPolicies } from "@/lib/stay-details";
 
 /**
  * The stay's house rules, its cancellation policy, then Roam's other policies, each with its full body.
- * `?section=cancellation` opens it scrolled to the cancellation section (the measured onLayout y).
+ * `?section=<policy kind>` (cancellation, checkIn, pets, payment, booking, damage, guestRefund) opens it scrolled to
+ * that policy: the section's measured onLayout y. No `section`: it opens at the top.
  */
 export default function PoliciesSheet() {
   const params = useLocalSearchParams<{ slug: string; section?: string }>();
@@ -18,13 +19,18 @@ export default function PoliciesSheet() {
   const { stay, status } = useStay(slug);
 
   const scrollRef = useRef<ScrollView>(null);
-  const [cancellationY, setCancellationY] = useState<number | null>(null);
+  // y of each section, by policy kind, as measured. One handler for every section (a curried one fails the
+  // react-hooks/refs lint rule).
+  const [sectionY, setSectionY] = useState<Record<string, number>>({});
+  const onSectionLayout = (kind: string, e: LayoutChangeEvent) => {
+    const y = e.nativeEvent.layout.y;
+    setSectionY((prev) => (prev[kind] !== undefined ? prev : { ...prev, [kind]: y }));
+  };
 
+  const targetY = section ? sectionY[section] : undefined;
   useEffect(() => {
-    if (section === "cancellation" && cancellationY !== null) {
-      scrollRef.current?.scrollTo({ y: cancellationY, animated: false });
-    }
-  }, [section, cancellationY]);
+    if (targetY !== undefined) scrollRef.current?.scrollTo({ y: targetY, animated: false });
+  }, [targetY]);
 
   if (!stay) {
     return (
@@ -66,7 +72,7 @@ export default function PoliciesSheet() {
       </View>
 
       {stay.cancellationPolicy ? (
-        <View className="mt-6" onLayout={(e) => setCancellationY(e.nativeEvent.layout.y)}>
+        <View className="mt-6" onLayout={(e) => onSectionLayout("cancellation", e)}>
           <Text variant="title" className="mb-3">
             {stay.cancellationPolicy.title}
           </Text>
@@ -75,7 +81,7 @@ export default function PoliciesSheet() {
       ) : null}
 
       {others.map((policy) => (
-        <View key={policy._id} className="mt-6">
+        <View key={policy._id} className="mt-6" onLayout={(e) => onSectionLayout(policy.kind, e)}>
           <Text variant="title" className="mb-3">
             {policy.title}
           </Text>
