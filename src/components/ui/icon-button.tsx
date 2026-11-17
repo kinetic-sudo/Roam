@@ -7,6 +7,8 @@ import type { Tone } from "./tones";
 
 const variants = {
   default: "bg-surface-muted",
+  muted: "bg-surface-muted", // same fill, named for headers (Ask)
+  primary: "bg-primary", // the send button
   surface: "bg-surface", // e.g. the heart on a listing photo
   // No fill: for controls inside another surface (field accessory, stepper).
   ghost: "",
@@ -14,6 +16,8 @@ const variants = {
 
 const sizes = {
   md: { box: "size-14", icon: 24 },
+  nav: { box: "size-11", icon: 22 }, // a screen header's back button
+  send: { box: "size-10", icon: 20 }, // inside the Ask input pill
   sm: { box: "size-9", icon: 18 },
 } as const;
 
