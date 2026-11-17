@@ -28,6 +28,7 @@ export const stayIcons = {
   chat: { ios: "bubble.left", android: "chat_bubble_outline", web: "chat_bubble_outline" },
   policy: { ios: "doc.text", android: "description", web: "description" },
   rosette: { ios: "rosette", android: "workspace_premium", web: "workspace_premium" },
+  arrowUp: { ios: "arrow.up", android: "arrow_upward", web: "arrow_upward" },
   // Chip glyphs (filled where SF has them).
   homeFill: { ios: "house.fill", android: "home", web: "home" },
   cabin: { ios: "tree.fill", android: "cabin", web: "cabin" },
