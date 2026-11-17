@@ -15,29 +15,36 @@ export function formatTime(value: string): string {
 
 const has = (v: string | null | undefined): v is string => !!v && v.trim().length > 0;
 
-/** One line per rule, in the order the spec lists them. Rules the host did not set are left out. */
-export function houseRuleLines(rules: HouseRules): string[] {
-  const lines: string[] = [];
-  if (has(rules.checkInTime)) lines.push(`Check-in after ${formatTime(rules.checkInTime)}`);
-  if (has(rules.checkOutTime)) lines.push(`Checkout before ${formatTime(rules.checkOutTime)}`);
+export type HouseRuleKey = "checkIn" | "checkOut" | "quiet" | "pets" | "smoking" | "parties" | "extra";
+
+/** The house rules as keyed lines, so a caller can pick "the pets line" without matching strings. */
+export function houseRuleParts(rules: HouseRules): { key: HouseRuleKey; text: string }[] {
+  const out: { key: HouseRuleKey; text: string }[] = [];
+  const add = (key: HouseRuleKey, text: string) => out.push({ key, text });
+
+  if (has(rules.checkInTime)) add("checkIn", `Check-in after ${formatTime(rules.checkInTime)}`);
+  if (has(rules.checkOutTime)) add("checkOut", `Checkout before ${formatTime(rules.checkOutTime)}`);
   if (has(rules.quietHoursFrom) && has(rules.quietHoursTo))
-    lines.push(`Quiet hours ${formatTime(rules.quietHoursFrom)} to ${formatTime(rules.quietHoursTo)}`);
+    add("quiet", `Quiet hours ${formatTime(rules.quietHoursFrom)} to ${formatTime(rules.quietHoursTo)}`);
 
   if (rules.petsAllowed) {
     const parts = ["Pets allowed"];
     if (rules.maxPets != null) parts.push(`up to ${rules.maxPets}`);
     if (rules.petFee != null) parts.push(`$${rules.petFee} pet fee per stay`);
-    lines.push(parts.join(", "));
+    add("pets", parts.join(", "));
   } else {
-    lines.push("No pets");
+    add("pets", "No pets");
   }
 
-  if (rules.smokingAllowed != null) lines.push(rules.smokingAllowed ? "Smoking allowed" : "No smoking");
-  if (rules.partiesAllowed != null) lines.push(rules.partiesAllowed ? "Parties allowed" : "No parties or events");
+  if (rules.smokingAllowed != null) add("smoking", rules.smokingAllowed ? "Smoking allowed" : "No smoking");
+  if (rules.partiesAllowed != null) add("parties", rules.partiesAllowed ? "Parties allowed" : "No parties or events");
 
-  for (const rule of rules.additionalRules ?? []) if (has(rule)) lines.push(rule);
-  return lines;
+  for (const rule of rules.additionalRules ?? []) if (has(rule)) add("extra", rule);
+  return out;
 }
+
+/** One line per rule, in the order the spec lists them. Rules the host did not set are left out. */
+export const houseRuleLines = (rules: HouseRules): string[] => houseRuleParts(rules).map((p) => p.text);
 
 /** `pricePerNight × minNights + (cleaningFee ?? 0)`. Until dates exist, a stay is priced at its minimum. */
 export function stayTotal(
@@ -100,4 +107,18 @@ export function sortPolicies<T extends { kind: string }>(policies: T[]): T[] {
     .map((p, i) => ({ p, i }))
     .sort((a, b) => rank(a.p.kind) - rank(b.p.kind) || a.i - b.i)
     .map((x) => x.p);
+}
+
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+/** "6 guests", "3 bedrooms", "4 beds", "2.5 baths": the quick facts under the place. Missing or zero ones are left out. */
+export function stayFacts(
+  stay: Pick<StayDetails, "maxGuests" | "bedrooms" | "beds" | "bathrooms">,
+): string[] {
+  const out: string[] = [];
+  if (stay.maxGuests > 0) out.push(count(stay.maxGuests, "guest", "guests"));
+  if (stay.bedrooms) out.push(count(stay.bedrooms, "bedroom", "bedrooms"));
+  if (stay.beds) out.push(count(stay.beds, "bed", "beds"));
+  if (stay.bathrooms) out.push(count(stay.bathrooms, "bath", "baths"));
+  return out;
 }

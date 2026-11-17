@@ -5,6 +5,7 @@ import { Alert, ScrollView, Share, View, type NativeScrollEvent, type NativeSynt
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AmenityRow } from "@/components/stay/amenities-row";
+import { FactsRow } from "@/components/stay/facts-row";
 import { HostRow } from "@/components/stay/host-row";
 import { PhotoButton } from "@/components/stay/photo-button";
 import { PhotoGallery } from "@/components/stay/photo-gallery";
@@ -13,12 +14,14 @@ import { PRICE_BAR_HEIGHT, PriceBar } from "@/components/stay/price-bar";
 import { RatingBox } from "@/components/stay/rating-box";
 import { StaySkeleton } from "@/components/stay/stay-skeleton";
 import { stayIcons } from "@/components/stays/icon";
+import { PinIcon } from "@/components/stays/pin-icon";
 import { rowIcons } from "@/components/stays/row-icons";
-import { Button, Icon, Text } from "@/components/ui";
+import { Button, Text } from "@/components/ui";
 import { useStay } from "@/hooks/use-stay";
 import { track } from "@/lib/analytics";
 import { useFavorite } from "@/lib/favorites";
 import { tapImpact, tapSelection } from "@/lib/haptics";
+import { stayFacts } from "@/lib/stay-details";
 import { placeLabel } from "@/lib/stays";
 
 /** The page scrolls past the photo (340 pt) under the status bar: switch the status bar to dark a little before. */
@@ -83,13 +86,14 @@ export default function StayDetails() {
   const place = placeLabel(stay);
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPastPhoto(e.nativeEvent.contentOffset.y > PHOTO_SCROLL);
 
-  const openPolicies = (from: "ask" | "cancellation") => {
-    track({ name: "stay_policies_opened", props: { slug, from } });
-    router.push({
-      pathname: "/stay/[slug]/policies",
-      params: from === "cancellation" ? { slug, section: "cancellation" } : { slug },
-    });
+  // The cancellation card opens the Policies sheet at the cancellation policy.
+  const openCancellation = () => {
+    track({ name: "stay_policies_opened", props: { slug, from: "cancellation" } });
+    router.push({ pathname: "/stay/[slug]/policies", params: { slug, section: "cancellation" } });
   };
+
+  // "Ask about policies" opens the full-screen chat (stay_ask_opened fires there).
+  const openAsk = () => router.push({ pathname: "/stay/[slug]/ask", params: { slug } });
 
   const share = () => {
     track({ name: "stay_shared", props: { slug } });
@@ -115,7 +119,7 @@ export default function StayDetails() {
       >
         <PhotoGallery photos={stay.photos} title={stay.title} place={place} />
 
-        <View className="-mt-2 rounded-t-sm bg-surface px-5 pt-5">
+        <View className="-mt-6 rounded-t-xl bg-surface px-5 pt-6 corner-squircle">
           <View className="flex-row items-start gap-4">
             <Text variant="stayTitle" numberOfLines={3} className="flex-1">
               {stay.title}
@@ -124,20 +128,22 @@ export default function StayDetails() {
           </View>
 
           <View className="mt-3 flex-row items-center gap-2">
-            <Icon name={stayIcons.marker} size={20} />
+            <PinIcon size={22} className="text-ink" />
             <Text variant="body">{place}</Text>
           </View>
 
+          <FactsRow facts={stayFacts(stay)} />
+
           <AmenityRow stay={stay} />
 
-          <View className="mt-1.5 gap-2.5">
+          <View className="mt-2 gap-3">
             <PolicyCard
               tile
               icon={stayIcons.chat}
               title="Ask about policies"
               subtitle="Cancellation, house rules, pets, check-in and more."
-              accessibilityHint="Opens the policies"
-              onPress={() => openPolicies("ask")}
+              accessibilityHint="Opens a chat about this stay's policies"
+              onPress={openAsk}
             />
             {stay.cancellationPolicy ? (
               <PolicyCard
@@ -146,14 +152,14 @@ export default function StayDetails() {
                 title={stay.cancellationPolicy.title}
                 subtitle={stay.cancellationPolicy.summary}
                 accessibilityHint="Opens the cancellation policy"
-                onPress={() => openPolicies("cancellation")}
+                onPress={openCancellation}
               />
             ) : null}
           </View>
 
           {stay.host ? (
             <>
-              <View className="mt-2.5 h-px bg-border" />
+              <View className="mt-4" />
               <HostRow
                 host={stay.host}
                 onPress={() => {
@@ -162,6 +168,15 @@ export default function StayDetails() {
                 }}
               />
             </>
+          ) : null}
+
+          {stay.summary ? (
+            <View className="mt-7 pb-4">
+              <Text variant="title">About this stay</Text>
+              <Text variant="body" tone="muted" className="mt-2">
+                {stay.summary}
+              </Text>
+            </View>
           ) : null}
         </View>
       </ScrollView>
