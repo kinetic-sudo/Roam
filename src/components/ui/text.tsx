@@ -25,6 +25,7 @@ const variants = {
   buttonSecondary: "font-jakarta-medium text-button",
   caption: "font-jakarta-medium text-caption",
   footnote: "font-jakarta-medium text-footnote",
+  link: "font-jakarta-semibold text-label",
 } as const;
 
 export type TextVariant = keyof typeof variants;
