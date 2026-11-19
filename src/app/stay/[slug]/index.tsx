@@ -5,7 +5,7 @@ import { Alert, ScrollView, Share, View, type NativeScrollEvent, type NativeSynt
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AmenityRow } from "@/components/stay/amenities-row";
-import { FactsRow } from "@/components/stay/facts-row";
+// import { FactsRow } from "@/components/stay/facts-row";
 import { HostRow } from "@/components/stay/host-row";
 import { PhotoButton } from "@/components/stay/photo-button";
 import { PhotoGallery } from "@/components/stay/photo-gallery";
@@ -21,7 +21,6 @@ import { useStay } from "@/hooks/use-stay";
 import { track } from "@/lib/analytics";
 import { useFavorite } from "@/lib/favorites";
 import { tapImpact, tapSelection } from "@/lib/haptics";
-import { stayFacts } from "@/lib/stay-details";
 import { placeLabel } from "@/lib/stays";
 
 /** The page scrolls past the photo (340 pt) under the status bar: switch the status bar to dark a little before. */
@@ -132,7 +131,7 @@ export default function StayDetails() {
             <Text variant="body">{place}</Text>
           </View>
 
-          <FactsRow facts={stayFacts(stay)} />
+          {/* <FactsRow facts={stayFacts(stay)} /> */}
 
           <AmenityRow stay={stay} />
 
