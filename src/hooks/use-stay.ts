@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { STAY_QUERY } from "@/lib/queries";
+import { normalizeStay } from "@/lib/stay-details";
 import { sanityQuery } from "@/lib/sanity";
 import type { StayDetails, StayPolicy } from "@/lib/stays";
 
@@ -39,7 +40,7 @@ export function useStay(slug: string) {
     const controller = new AbortController();
     sanityQuery<Response>(STAY_QUERY, { slug }, controller.signal)
       .then((r) => {
-        const stay = r.stay ? { ...r.stay, policies: r.policies ?? [] } : null;
+        const stay = r.stay ? normalizeStay(r.stay, r.policies) : null;
         cache.set(slug, stay);
         setEntry({ slug, stay });
       })
