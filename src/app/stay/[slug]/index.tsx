@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Alert, ScrollView, Share, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { AmenityRow } from "@/components/stay/amenity-row";
+import { AmenityRow } from "@/components/stay/amenities-row";
 import { FactsRow } from "@/components/stay/facts-row";
 import { GoodToKnow } from "@/components/stay/good-to-know";
 import { HostRow } from "@/components/stay/host-row";
