@@ -1,6 +1,6 @@
 // src/lib/stay-details.ts
 // Pure helpers for the stay details screen. No network, no React: easy to test.
-import type { HouseRules, StayDetails, StayHost } from "./stays";
+import type { HouseRules, StayDetails, StayHost, StayPolicy } from "./stays";
 
 /** "15:00" -> "3:00 PM". Anything that is not HH:MM comes back unchanged. */
 export function formatTime(value: string): string {
@@ -121,4 +121,28 @@ export function stayFacts(
   if (stay.beds) out.push(count(stay.beds, "bed", "beds"));
   if (stay.bathrooms) out.push(count(stay.bathrooms, "bath", "baths"));
   return out;
+}
+
+/**
+ * Fills in what a stay may be missing, so no screen has to guard each field: a stay added by hand in Studio can
+ * have no slug, photos, amenities, rating or house rules yet. Opens the stay instead of crashing on it.
+ */
+export function normalizeStay(
+  raw: Omit<StayDetails, "policies">,
+  policies: StayPolicy[] | null | undefined,
+): StayDetails {
+  return {
+    ...raw,
+    slug: raw.slug?.current ? raw.slug : { current: raw._id },
+    amenities: raw.amenities ?? [],
+    photos: raw.photos ?? [],
+    pricePerNight: raw.pricePerNight ?? 0,
+    maxGuests: raw.maxGuests ?? 0,
+    rating: raw.rating ?? 0,
+    reviewCount: raw.reviewCount ?? 0,
+    houseRules: raw.houseRules
+      ? { ...raw.houseRules, petsAllowed: raw.houseRules.petsAllowed ?? false }
+      : { petsAllowed: false },
+    policies: policies ?? [],
+  };
 }

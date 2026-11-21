@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { View } from "react-native";
 import { styled } from "react-native-css";
 
@@ -9,7 +10,7 @@ import { tapSelection } from "@/lib/haptics";
 import { imageUrl } from "@/lib/sanity";
 import type { ParsedQuery } from "@/lib/search/parse";
 import { matchTags } from "@/lib/search/query";
-import { placeLabel, type Stay } from "@/lib/stays";
+import { placeLabel, stayParam, type Stay } from "@/lib/stays";
 
 import { searchIcons, tagIcons } from "./icons";
 
@@ -25,82 +26,99 @@ export function ResultTag({ label, icon }: { label: string; icon: Parameters<typ
   );
 }
 
-/** Compact horizontal result: photo, title + heart, place, rating, two tags, price. Not tappable yet (no details screen). */
+/**
+ * Compact horizontal result: photo, title + heart, place, rating, two tags, price. Tapping the card opens the stay.
+ * The card and the heart are siblings (the heart floats over the card's top-right corner), so each has its own
+ * press and VoiceOver reaches both.
+ */
 export function ResultCard({ stay, parsed }: { stay: Stay; parsed: ParsedQuery }) {
+  const router = useRouter();
   const [saved, toggle] = useFavorite(stay._id);
   const photo = stay.photos?.[0];
   const url = photo?.asset?.url;
   const tags = matchTags(stay, parsed);
 
   return (
-    <View className="flex-row gap-3.5 rounded-xl bg-surface shadow-card">
-      {url ? (
-        <StyledImage
-          source={{ uri: imageUrl(url, 600) }}
-          contentFit="cover"
-          transition={200}
-          className="h-38 w-37 rounded-md bg-surface-muted"
-          accessibilityLabel={photo?.alt || `${stay.title}, ${placeLabel(stay)}`}
-        />
-      ) : (
-        // 14 seeded stays have no photo yet.
-        <View className="h-38 w-37 items-center justify-center rounded-md bg-surface-muted">
-          <Icon name={searchIcons.home} size={28} tone="subtle" />
-        </View>
-      )}
-
-      <View className="flex-1 justify-between py-1">
-        <View>
-          <View className="flex-row items-start gap-2">
-            {/* Needs the `cardTitle` variant in text.tsx (see SETUP-SEARCH.md) */}
-            <Text variant="cardTitle" numberOfLines={2} className="flex-1">
-              {stay.title}
-            </Text>
-            <PressableScale
-              onPress={() => {
-                tapSelection();
-                toggle();
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={saved ? `Remove ${stay.title} from saved` : `Save ${stay.title}`}
-              accessibilityState={{ selected: saved }}
-              className="size-11 items-center justify-center rounded-full bg-surface-muted"
-            >
-              <Icon name={saved ? searchIcons.heartFill : searchIcons.heart} size={22} tone={saved ? "danger" : undefined} />
-            </PressableScale>
+    <View className="relative">
+      <PressableScale
+        onPress={() => router.push({ pathname: "/stay/[slug]", params: { slug: stayParam(stay) } })}
+        accessibilityRole="button"
+        accessibilityLabel={`${stay.title}, ${placeLabel(stay)}. Rated ${stay.rating.toFixed(1)}, $${stay.pricePerNight} a night.`}
+        accessibilityHint="Opens the stay"
+        className="flex-row gap-3.5 rounded-xl bg-surface shadow-card"
+      >
+        {url ? (
+          <StyledImage
+            source={{ uri: imageUrl(url, 600) }}
+            contentFit="cover"
+            transition={200}
+            className="h-38 w-37 rounded-md bg-surface-muted"
+            accessibilityLabel={photo?.alt || `${stay.title}, ${placeLabel(stay)}`}
+          />
+        ) : (
+          // 14 seeded stays have no photo yet.
+          <View className="h-38 w-37 items-center justify-center rounded-md bg-surface-muted">
+            <Icon name={searchIcons.home} size={28} tone="subtle" />
           </View>
+        )}
 
-          <View className="mt-1.5 flex-row items-center gap-1.5">
-            <Icon name={searchIcons.marker} size={16} tone="subtle" />
-            <Text variant="caption" tone="subtle" numberOfLines={1} className="flex-1">
-              {placeLabel(stay)}
-            </Text>
-          </View>
-
-          <View className="mt-1.5 flex-row items-center gap-1.5">
-            <StarIcon size={18} />
-            <Text variant="label">{stay.rating.toFixed(1)}</Text>
-            <Text variant="label" tone="subtle">
-              ({stay.reviewCount})
-            </Text>
-          </View>
-        </View>
-
-        <View>
-          {tags.length > 0 ? (
-            <View className="flex-row gap-2">
-              {tags.map((t) => (
-                <ResultTag key={t.key} label={t.label} icon={tagIcons[t.key]} />
-              ))}
+        <View className="flex-1 justify-between py-1">
+          <View>
+            <View className="flex-row items-start gap-2">
+              <Text variant="cardTitle" numberOfLines={2} className="flex-1">
+                {stay.title}
+              </Text>
+              {/* Room for the heart, which floats over this corner */}
+              <View className="size-11" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />
             </View>
-          ) : null}
-          <View className="mt-2 flex-row items-baseline gap-1.5">
-            <Text variant="title">${stay.pricePerNight}</Text>
-            <Text variant="label" tone="subtle">
-              / night
-            </Text>
+
+            <View className="mt-1.5 flex-row items-center gap-1.5">
+              <Icon name={searchIcons.marker} size={16} tone="subtle" />
+              <Text variant="caption" tone="subtle" numberOfLines={1} className="flex-1">
+                {placeLabel(stay)}
+              </Text>
+            </View>
+
+            <View className="mt-1.5 flex-row items-center gap-1.5">
+              <StarIcon size={18} />
+              <Text variant="label">{stay.rating.toFixed(1)}</Text>
+              <Text variant="label" tone="subtle">
+                ({stay.reviewCount})
+              </Text>
+            </View>
+          </View>
+
+          <View>
+            {tags.length > 0 ? (
+              <View className="flex-row gap-2">
+                {tags.map((t) => (
+                  <ResultTag key={t.key} label={t.label} icon={tagIcons[t.key]} />
+                ))}
+              </View>
+            ) : null}
+            <View className="mt-2 flex-row items-baseline gap-1.5">
+              <Text variant="title">${stay.pricePerNight}</Text>
+              <Text variant="label" tone="subtle">
+                / night
+              </Text>
+            </View>
           </View>
         </View>
+      </PressableScale>
+
+      <View className="absolute right-0 top-1">
+        <PressableScale
+          onPress={() => {
+            tapSelection();
+            toggle();
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={saved ? `Remove ${stay.title} from saved` : `Save ${stay.title}`}
+          accessibilityState={{ selected: saved }}
+          className="size-11 items-center justify-center rounded-full bg-surface-muted"
+        >
+          <Icon name={saved ? searchIcons.heartFill : searchIcons.heart} size={22} tone={saved ? "danger" : undefined} />
+        </PressableScale>
       </View>
     </View>
   );

@@ -11,14 +11,22 @@ export const HOME_QUERY = `*[_type == "property"] | order(rating desc, reviewCou
 const POLICY = `{ _id, title, "slug": slug.current, kind, summary, body }`;
 
 /**
- * One stay by `$slug`, plus Roam's non-cancellation policies. `stay` is null when the slug matches nothing.
+ * One stay by `$slug` (its slug, or its `_id` when it has no slug), plus Roam's non-cancellation policies.
+ * `stay` is null when nothing matches. Empty fields are filled in here and again in `normalizeStay`, so a stay
+ * added by hand in Studio (no photos, no amenities, no rating yet) still opens.
  * `houseRules` is built field by field so it is never null and `petsAllowed` is always a boolean.
  */
 export const STAY_QUERY = `{
-  "stay": *[_type == "property" && slug.current == $slug][0]{
-    _id, title, slug, type, pricePerNight, cleaningFee, minNights, maxGuests, rating, reviewCount,
-    city, region, country, neighborhood, amenities, summary,
-    "photos": photos[]{ alt, asset->{ url } },
+  "stay": *[_type == "property" && (slug.current == $slug || _id == $slug)][0]{
+    _id, title, type, cleaningFee, minNights, bedrooms, beds, bathrooms,
+    "slug": coalesce(slug, { "current": _id }),
+    "pricePerNight": coalesce(pricePerNight, 0),
+    "maxGuests": coalesce(maxGuests, 0),
+    "rating": coalesce(rating, 0),
+    "reviewCount": coalesce(reviewCount, 0),
+    city, region, country, neighborhood, summary, highlights,
+    "amenities": coalesce(amenities, []),
+    "photos": coalesce(photos[]{ alt, asset->{ url } }, []),
     "houseRules": {
       "petsAllowed": coalesce(houseRules.petsAllowed, false),
       "maxPets": houseRules.maxPets,
