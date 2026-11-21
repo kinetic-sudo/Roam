@@ -28,6 +28,11 @@ export const stayIcons = {
   chat: { ios: "bubble.left", android: "chat_bubble_outline", web: "chat_bubble_outline" },
   policy: { ios: "doc.text", android: "description", web: "description" },
   rosette: { ios: "rosette", android: "workspace_premium", web: "workspace_premium" },
+  // Good to know. Each SF name must be confirmed to render in the simulator.
+  clock: { ios: "clock", android: "schedule", web: "schedule" },
+  moon: { ios: "moon", android: "bedtime", web: "bedtime" },
+  smoking: { ios: "nosign", android: "smoke_free", web: "smoke_free" },
+  party: { ios: "party.popper", android: "celebration", web: "celebration" },
   arrowUp: { ios: "arrow.up", android: "arrow_upward", web: "arrow_upward" },
   // Chip glyphs (filled where SF has them).
   homeFill: { ios: "house.fill", android: "home", web: "home" },
