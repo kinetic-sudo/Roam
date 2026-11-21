@@ -164,6 +164,9 @@ export interface StayHost {
 
 /** One stay, read by slug for the details screen. */
 export interface StayDetails extends Omit<Stay, "houseRules"> {
+  bedrooms?: number | null;
+  beds?: number | null;
+  bathrooms?: number | null;
   cleaningFee?: number | null;
   minNights?: number | null;
   houseRules: HouseRules;
@@ -172,3 +175,10 @@ export interface StayDetails extends Omit<Stay, "houseRules"> {
   /** Roam's other policies (everything that is not a cancellation policy). */
   policies: StayPolicy[];
 }
+
+/**
+ * What goes in the route for a stay: its slug, or its `_id` when it has none (a stay added by hand in Studio
+ * before its slug was generated). The details query accepts either.
+ */
+export const stayParam = (s: { _id: string; slug?: { current?: string | null } | null }): string =>
+  s.slug?.current || s._id;
