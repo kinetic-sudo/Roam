@@ -5,10 +5,10 @@ import { styled } from "react-native-css";
 
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { imageUrl } from "@/lib/sanity";
-import { placeLabel, type HomeStay } from "@/lib/stays";
+import { placeLabel, stayParam, type HomeStay } from "@/lib/stays";
 
-import { PinIcon } from "../stays/pin-icon";
 import { stayIcons } from "./icon";
+import { PinIcon } from "./pin-icon";
 
 const StyledImage = styled(Image, { className: "style" });
 
@@ -20,7 +20,7 @@ export function PropertyCard({ stay }: { stay: HomeStay }) {
 
   return (
     <PressableScale
-      onPress={() => router.push({ pathname: "/stay/[slug]", params: { slug: stay.slug.current } })}
+      onPress={() => router.push({ pathname: "/stay/[slug]", params: { slug: stayParam(stay) } })}
       accessibilityRole="button"
       accessibilityLabel={`${stay.title}, ${placeLabel(stay)}. Rated ${stay.rating.toFixed(1)}, $${stay.pricePerNight} a night.`}
       accessibilityHint="Opens the stay"
