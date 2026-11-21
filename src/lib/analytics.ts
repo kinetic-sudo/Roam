@@ -8,7 +8,7 @@ type Props = Record<string, string | number | boolean | string[]>;
 export type AnalyticsEvent =
   | { name: "stay_viewed"; props: { slug: string; type: string } }
   | { name: "stay_shared"; props: { slug: string } }
-  | { name: "stay_policies_opened"; props: { slug: string; from: "ask" | "cancellation" | "ask_answer" } }
+  | { name: "stay_policies_opened"; props: { slug: string; from: "ask" | "cancellation" | "ask_answer" | "good_to_know" } }
   | { name: "stay_host_opened"; props: { slug: string } }
   | { name: "stay_book_tapped"; props: { slug: string } }
   | { name: "stay_ask_opened"; props: { slug: string } }
