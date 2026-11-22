@@ -7,8 +7,7 @@ import { StarIcon } from "@/components/stays/star-icons";
 import { Icon, PressableScale, Text } from "@/components/ui";
 import { useFavorite } from "@/lib/favorites";
 import { tapSelection } from "@/lib/haptics";
-import { imageUrl } from "@/lib/sanity";
-import type { ParsedQuery } from "@/lib/search/parse";
+import type { SearchIntent } from "@/lib/search/intent";
 import { matchTags } from "@/lib/search/query";
 import { placeLabel, stayParam, type Stay } from "@/lib/stays";
 
@@ -31,12 +30,12 @@ export function ResultTag({ label, icon }: { label: string; icon: Parameters<typ
  * The card and the heart are siblings (the heart floats over the card's top-right corner), so each has its own
  * press and VoiceOver reaches both.
  */
-export function ResultCard({ stay, parsed }: { stay: Stay; parsed: ParsedQuery }) {
+export function ResultCard({ stay, intent }: { stay: Stay; intent: SearchIntent }) {
   const router = useRouter();
   const [saved, toggle] = useFavorite(stay._id);
   const photo = stay.photos?.[0];
   const url = photo?.asset?.url;
-  const tags = matchTags(stay, parsed);
+  const tags = matchTags(stay, intent);
 
   return (
     <View className="relative">
@@ -49,7 +48,8 @@ export function ResultCard({ stay, parsed }: { stay: Stay; parsed: ParsedQuery }
       >
         {url ? (
           <StyledImage
-            source={{ uri: imageUrl(url, 600) }}
+            // The server already applied imageUrl(url, 600).
+            source={{ uri: url }}
             contentFit="cover"
             transition={200}
             className="h-38 w-37 rounded-md bg-surface-muted"

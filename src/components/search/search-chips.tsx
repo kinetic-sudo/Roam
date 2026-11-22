@@ -4,8 +4,8 @@ import { ScrollView } from "react-native";
 import { PressableScale, Text } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { tapSelection } from "@/lib/haptics";
-import type { ParsedQuery } from "@/lib/search/parse";
-import { chipsFor, isChipOn, type SearchChip as Chip } from "@/lib/search/query";
+import type { SearchIntent } from "@/lib/search/intent";
+import { chipsFor, hasChip, type SearchChip as Chip } from "@/lib/search/query";
 
 function SearchChip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
   return (
@@ -23,10 +23,10 @@ function SearchChip({ label, selected, onPress }: { label: string; selected: boo
 }
 
 type Props = {
-  /** The submitted query: decides which chips exist and their order. */
-  base: ParsedQuery;
-  /** The query with the guest's toggles applied: decides which chips are selected. */
-  current: ParsedQuery;
+  /** How the server read the sentence: decides which chips exist and their order. */
+  base: SearchIntent;
+  /** The intent with the guest's toggles applied: decides which chips are selected. */
+  current: SearchIntent;
   onToggle: (chip: Chip) => void;
 };
 
@@ -43,7 +43,7 @@ export function SearchChips({ base, current, onToggle }: Props) {
       accessibilityLabel="Search filters"
     >
       {chips.map((chip) => {
-        const selected = isChipOn(current, chip);
+        const selected = hasChip(current, chip);
         return (
           <SearchChip
             key={chip.id}

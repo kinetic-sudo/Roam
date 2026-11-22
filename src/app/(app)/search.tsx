@@ -9,10 +9,10 @@ import { SearchBar } from "@/components/search/search-bar";
 import { SearchChips } from "@/components/search/search-chips";
 import { SortMenu } from "@/components/search/search-sort";
 import { Button, Icon, PressableScale, Text } from "@/components/ui";
-import { usePlaces, useSearchStays } from "@/hooks/use-search-stays";
+import { useSearchStays, type SearchRequest } from "@/hooks/use-search-stays";
 import { tapImpact } from "@/lib/haptics";
-import { parseSearchQuery, type ParsedQuery } from "@/lib/search/parse";
-import { chipsFor, isChipOn, searchKey, toggleChip, type SearchChip, type SortOption } from "@/lib/search/query";
+import type { SearchIntent } from "@/lib/search/intent";
+import { describeIntent, EMPTY_INTENT, toggleChip, type SearchChip, type SortOption } from "@/lib/search/query";
 import { easeOut, stagger } from "@/theme";
 
 // One builder per row index, at module scope. Capped so a long list doesn't wait seconds.
@@ -21,22 +21,30 @@ const ROW_IN = Array.from({ length: MAX_STAGGER_INDEX + 1 }, (_, i) =>
   FadeInDown.duration(250).easing(easeOut).delay(i * stagger).reduceMotion(ReduceMotion.System),
 );
 
-const cap = (s: string) => s.replace(/\b\w/g, (c) => c.toUpperCase());
-
 export default function Search() {
   const router = useRouter();
   const { q } = useLocalSearchParams<{ q?: string }>();
   const submitted = (q ?? "").trim();
 
-  // The sentence, parsed once the real place names are known.
-  const places = usePlaces();
-  const base = useMemo(() => parseSearchQuery(submitted, places ?? []), [submitted, places]);
-  const baseKey = searchKey(base, "best");
-
-  // Chip toggles are local and reset whenever the query changes (they are tied to the base they were made on).
-  const [toggled, setToggled] = useState<{ baseKey: string; query: ParsedQuery } | null>(null);
-  const current = toggled && toggled.baseKey === baseKey ? toggled.query : base;
   const [sort, setSort] = useState<SortOption>("best");
+
+  // The server reads the sentence (Jev) and answers with the intent. That reading, and the guest's chip edits,
+  // belong to one submitted sentence: when `q` changes they are ignored.
+  const [read, setRead] = useState<{ q: string; intent: SearchIntent } | null>(null);
+  const [edit, setEdit] = useState<{ q: string; intent: SearchIntent } | null>(null);
+  const interpreted = read?.q === submitted ? read.intent : null;
+  const edited = edit?.q === submitted ? edit.intent : null;
+  const active = edited ?? interpreted;
+
+  // First the sentence ({ q }, which runs Jev); once it is read, the intent ({ intent }, which does not).
+  const request = useMemo<SearchRequest>(() => (active ? { intent: active } : { q: submitted }), [active, submitted]);
+  const { result, error, retry } = useSearchStays(request, sort);
+
+  // The first answer to a sentence carries its reading: keep it as the base for the chips.
+  useEffect(() => {
+    if (!result || interpreted || !("q" in result.request) || result.request.q !== submitted) return;
+    setRead({ q: submitted, intent: result.intent });
+  }, [result, interpreted, submitted]);
 
   const [text, setText] = useState(submitted);
   const inputRef = useRef<TextInput>(null);
@@ -55,24 +63,28 @@ export default function Search() {
     }, [submitted]),
   );
 
-  const { stays, total, hasResult, status, retry, requestKey } = useSearchStays(current, sort, places !== null);
+  const stays = result?.stays ?? [];
+  const total = result?.total ?? 0;
+  const hasResult = result !== null;
+  const failed = error !== null;
+  /** How the results on screen were read: drives the card tags and the empty-state description. */
+  const shown = result?.intent ?? EMPTY_INTENT;
 
   const submit = (value: string) => {
     tapImpact();
     router.setParams({ q: value });
   };
-  const onToggle = (chip: SearchChip) => setToggled({ baseKey, query: toggleChip(current, chip) });
+  const onToggle = (chip: SearchChip) => {
+    if (interpreted) setEdit({ q: submitted, intent: toggleChip(active ?? interpreted, chip) });
+  };
   const clear = () => {
     setText("");
     router.setParams({ q: "" });
   };
 
-  const showSkeleton = !hasResult && status !== "error";
-  const showEmpty = hasResult && status !== "error" && total === 0;
-  const constraintBadges = [
-    ...(base.place ? [cap(base.place)] : []),
-    ...chipsFor(base).filter((c) => !c.suggested && isChipOn(current, c)).map((c) => c.label),
-  ];
+  const showSkeleton = !hasResult && !failed;
+  const showEmpty = hasResult && !failed && total === 0;
+  const constraintBadges = describeIntent(shown);
 
   return (
     <ScrollView
@@ -95,7 +107,7 @@ export default function Search() {
         <SearchBar ref={inputRef} value={text} onChangeText={setText} onSubmit={submit} />
       </View>
 
-      <SearchChips base={base} current={current} onToggle={onToggle} />
+      {interpreted ? <SearchChips base={interpreted} current={active ?? interpreted} onToggle={onToggle} /> : null}
 
       {hasResult && !showEmpty ? (
         <View className="mt-5 flex-row items-center justify-between">
@@ -106,7 +118,7 @@ export default function Search() {
         </View>
       ) : null}
 
-      {status === "error" ? (
+      {failed ? (
         <View className="mt-6 items-center gap-3">
           <Text tone="muted" className="text-center">
             We couldn’t load stays right now.
@@ -150,8 +162,8 @@ export default function Search() {
           <View className="mt-4 gap-4">
             {stays.map((stay, i) => (
               // Keyed by the request: every new query, toggle or sort remounts the rows, so the stagger replays.
-              <Animated.View key={`${requestKey}|${stay._id}`} entering={ROW_IN[Math.min(i, MAX_STAGGER_INDEX)]}>
-                <ResultCard stay={stay} parsed={current} />
+              <Animated.View key={`${result?.key}|${stay._id}`} entering={ROW_IN[Math.min(i, MAX_STAGGER_INDEX)]}>
+                <ResultCard stay={stay} intent={shown} />
               </Animated.View>
             ))}
           </View>
