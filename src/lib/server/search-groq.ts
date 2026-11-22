@@ -129,10 +129,17 @@ function boosts(i: SearchIntent): string[] {
  *  - Best match with a sentence: `score(text::semanticSimilarity(sentence), boost(...)...)`, then
  *    `order(<demote> asc, _score desc, rating desc, reviewCount desc)`. Avoided vibes are demoted with the order
  *    term because a negative boost weight scores 0.
+ *  - `semantic: false` (no Context endpoint, so no embeddings): the same query without `text::semanticSimilarity`.
+ *    The sentence is not written into the query at all; boosts still rank, filters are unchanged.
  *  - Best match with an empty sentence: no score, `order(rating desc, reviewCount desc)`.
  *  - Any other sort: that sort's own order(), no score.
  */
-export function buildSearchGroq(intent: SearchIntent, sort: SortOption, known: ReadonlySet<string>): string {
+export function buildSearchGroq(
+  intent: SearchIntent,
+  sort: SortOption,
+  known: ReadonlySet<string>,
+  opts: { semantic?: boolean } = {},
+): string {
   const F = filters(intent, known).join(" && ");
   const text = cleanSentence(intent.text);
 
@@ -142,11 +149,16 @@ export function buildSearchGroq(intent: SearchIntent, sort: SortOption, known: R
   } else if (text.length === 0) {
     pipeline = "order(rating desc, reviewCount desc)";
   } else {
-    const score = [`text::semanticSimilarity(${lit({ kind: "text", value: text })})`, ...boosts(intent)].join(", ");
+    const parts = [
+      ...(opts.semantic ?? true ? [`text::semanticSimilarity(${lit({ kind: "text", value: text })})`] : []),
+      ...boosts(intent),
+    ];
     const demote = intent.vibes.avoided.length
       ? `count(coalesce(vibes, [])[@ in ${list("vibe", intent.vibes.avoided)}]) asc, `
       : "";
-    pipeline = `score(${score}) | order(${demote}_score desc, rating desc, reviewCount desc)`;
+    pipeline = parts.length
+      ? `score(${parts.join(", ")}) | order(${demote}_score desc, rating desc, reviewCount desc)`
+      : `order(${demote}rating desc, reviewCount desc)`;
   }
 
   return `{ "total": count(*[${F}]), "stays": *[${F}] | ${pipeline}[0...${MAX_RESULTS}]${PROJECTION} }`;
