@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@ai-sdk/typesafe-ai": "3.0.17",
+    "@clerk/backend": "^3.31.4",
     "@clerk/expo": "^4.14.1",
     "@expo-google-fonts/outfit": "^0.4.3",
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
     "@expo/ui": "~58.0.22",
     "@react-native/assets-registry": "^0.88.0",
     "@sanity/client": "^8.14.1",
+    "ai": "7.0.137",
     "expo": "~58.0.17",
     "expo-asset": "~58.0.18",
     "expo-auth-session": "~58.0.14",
@@ -39,7 +42,8 @@
     "react-native-screens": "~4.30.0",
     "react-native-svg": "^15.16.0",
     "react-native-web": "~0.21.4",
-    "react-native-worklets": "0.13.0"
+    "react-native-worklets": "0.13.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.12",
