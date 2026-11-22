@@ -284,3 +284,35 @@ export function parseSearchQuery(
 
   return out;
 }
+
+// ------------------------------------------------------------------ places, for the server
+
+/**
+ * Finds the place in a sentence the same way `parseSearchQuery` does. Returns the lower-case place and the
+ * sentence without it. Jev does not judge place: code does.
+ */
+export function takePlace(text: string, places: string[] = []): { place?: string; rest: string } {
+  const rest = ` ${text.toLowerCase().replace(/\s+/g, " ")} `;
+  const found = findPlace(rest, places);
+  return found ? { place: found.place, rest: rest.replace(found.re, " ") } : { rest };
+}
+
+/** A place and its other form: "california" <-> "ca". Compared with lower(city), lower(region), lower(country)... */
+export function placeVariants(place: string): string[] {
+  const code = US_STATES[place];
+  if (code) return [place, code.toLowerCase()];
+  const name = STATE_BY_CODE[place];
+  if (name) return [place, name];
+  return [place];
+}
+
+/** Every place value a literal may carry: the data's place names, US state names and codes, canonical countries. */
+export function allowedPlaces(places: string[]): Set<string> {
+  const out = new Set<string>(places);
+  for (const [name, code] of Object.entries(US_STATES)) {
+    out.add(name);
+    out.add(code.toLowerCase());
+  }
+  for (const country of Object.values(COUNTRY_ALIASES)) out.add(country);
+  return out;
+}
